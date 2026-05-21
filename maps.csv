@@ -18,3 +18,4 @@ R,reloadTabHard,Reload tab bypassing cache
 dr,closeTabsRight,Close tabs to the right
 da,closeTabsOthers,Close all tabs except current
 yv,yankText,Yank text of element
+A-h,hoverElement,Hover over element

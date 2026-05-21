@@ -1,5 +1,5 @@
 import "./hints.css";
-import { beginHints, typeHint, endHints, HintSession } from "./hints";
+import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -24,7 +24,8 @@ type Action =
   | "reloadTabHard"
   | "closeTabsRight"
   | "closeTabsOthers"
-  | "yankText";
+  | "yankText"
+  | "hoverElement";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -35,6 +36,9 @@ const actions: Record<Action, () => void> = {
   },
   yankText: () => {
     session = beginHints("y");
+  },
+  hoverElement: () => {
+    session = beginHints("h");
   },
   scrollDown: () => {
     startScroll(1);
@@ -62,7 +66,11 @@ const actions: Record<Action, () => void> = {
 const continuousActions = new Set<Action>(["scrollDown", "scrollUp"]);
 
 const keyMap = new Map<string, Action>(
-  mappings.map(({ hotkey, action }) => [hotkey, action as Action]),
+  mappings.filter(({ hotkey }) => !hotkey.startsWith("A-")).map(({ hotkey, action }) => [hotkey, action as Action]),
+);
+
+const altKeyMap = new Map<string, Action>(
+  mappings.filter(({ hotkey }) => hotkey.startsWith("A-")).map(({ hotkey, action }) => [hotkey.slice(2), action as Action]),
 );
 
 // Keys that are the first character of a multi-char hotkey
@@ -94,7 +102,16 @@ function isEditing(): boolean {
 document.addEventListener(
   "keydown",
   (e: KeyboardEvent) => {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.ctrlKey || e.metaKey) return;
+
+    if (e.altKey) {
+      const action = altKeyMap.get(e.key);
+      if (action) {
+        e.preventDefault();
+        actions[action]();
+      }
+      return;
+    }
 
     if (session) {
       e.preventDefault();
@@ -109,6 +126,7 @@ document.addEventListener(
 
     if (e.key === "Escape") {
       (document.activeElement as HTMLElement)?.blur();
+      unhoverLast();
       return;
     }
 

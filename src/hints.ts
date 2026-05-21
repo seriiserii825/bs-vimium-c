@@ -54,7 +54,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y'
+export type HintMode = 'f' | 'F' | 'y' | 'h'
 
 export interface HintEntry {
   el: HTMLElement
@@ -69,8 +69,32 @@ export interface HintSession {
   container: HTMLElement
 }
 
+let lastHovered: HTMLElement | null = null
+
+function dispatchMouse(el: HTMLElement, type: string, x: number, y: number, bubbles = true): void {
+  el.dispatchEvent(new MouseEvent(type, { bubbles, cancelable: true, view: window, clientX: x, clientY: y }))
+}
+
+export function unhoverLast(): void {
+  if (!lastHovered) return
+  const el = lastHovered
+  lastHovered = null
+  const r = el.getBoundingClientRect()
+  const cx = r.left + r.width / 2
+  const cy = r.top + r.height / 2
+  dispatchMouse(el, 'mouseout', cx, cy)
+  dispatchMouse(el, 'mouseleave', cx, cy, false)
+}
+
+function getHoverable(): HTMLElement[] {
+  return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {
+    if (!isVisible(el)) return false
+    return window.getComputedStyle(el).cursor === 'pointer'
+  })
+}
+
 export function beginHints(mode: HintMode): HintSession | null {
-  const elements = mode === 'y' ? getCopyable() : getClickable()
+  const elements = mode === 'y' ? getCopyable() : mode === 'h' ? getHoverable() : getClickable()
   if (elements.length === 0) return null
 
   const labels = generateLabels(elements.length)
@@ -130,6 +154,15 @@ function activate(entry: HintEntry, mode: HintMode): void {
     showToast(text)
   } else if (mode === 'F' && entry.el instanceof HTMLAnchorElement && entry.el.href) {
     window.open(entry.el.href, '_blank')
+  } else if (mode === 'h') {
+    unhoverLast()
+    lastHovered = entry.el
+    const r = entry.el.getBoundingClientRect()
+    const cx = r.left + r.width / 2
+    const cy = r.top + r.height / 2
+    dispatchMouse(entry.el, 'mouseover', cx, cy)
+    dispatchMouse(entry.el, 'mouseenter', cx, cy, false)
+    dispatchMouse(entry.el, 'mousemove', cx, cy)
   } else {
     entry.el.focus()
     entry.el.click()
