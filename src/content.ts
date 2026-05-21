@@ -1,9 +1,11 @@
 import "./hints.css";
 import "./help.css";
 import "./prompt.css";
+import "./whichkey.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
 import { showPrompt, hidePrompt, isPromptVisible } from "./prompt";
+import { showWhichKey, hideWhichKey, isWhichKeyVisible } from "./whichkey";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -152,6 +154,7 @@ let prefixTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function clearPending(): void {
   pendingPrefix = "";
+  hideWhichKey();
   if (prefixTimeout !== null) {
     clearTimeout(prefixTimeout);
     prefixTimeout = null;
@@ -203,6 +206,7 @@ document.addEventListener(
     }
 
     if (e.key === "Escape") {
+      if (isWhichKeyVisible()) { clearPending(); e.preventDefault(); return; }
       if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
@@ -223,7 +227,8 @@ document.addEventListener(
         e.preventDefault();
         pendingPrefix = combo;
         if (prefixTimeout !== null) clearTimeout(prefixTimeout);
-        prefixTimeout = setTimeout(clearPending, 1000);
+        prefixTimeout = setTimeout(clearPending, 5000);
+        showWhichKey(pendingPrefix, mappings);
       } else {
         clearPending();
       }
@@ -233,7 +238,8 @@ document.addEventListener(
     if (prefixStrings.has(e.key)) {
       e.preventDefault();
       pendingPrefix = e.key;
-      prefixTimeout = setTimeout(clearPending, 1000);
+      prefixTimeout = setTimeout(clearPending, 5000);
+      showWhichKey(pendingPrefix, mappings);
       return;
     }
 
