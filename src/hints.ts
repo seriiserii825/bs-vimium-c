@@ -52,7 +52,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'ym' | 'om' | 'h'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'ym' | 'om' | 'h'
 
 export interface HintEntry {
   el: HTMLElement
@@ -150,7 +150,10 @@ function getHoverable(): HTMLElement[] {
 }
 
 export function beginHints(mode: HintMode): HintSession | null {
-  const elements = (mode === 'y' || mode === 'ym') ? getCopyable() : mode === 'h' ? getHoverable() : getClickable()
+  const elements = (mode === 'y' || mode === 'ym') ? getCopyable()
+    : mode === 'yl' ? Array.from(document.querySelectorAll<HTMLElement>('a[href]')).filter(isVisible)
+    : mode === 'h' ? getHoverable()
+    : getClickable()
   if (elements.length === 0) return null
 
   const labels = generateLabels(elements.length)
@@ -237,7 +240,11 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
 }
 
 function activate(entry: HintEntry, mode: HintMode): void {
-  if (mode === 'y') {
+  if (mode === 'yl') {
+    const url = (entry.el as HTMLAnchorElement).href
+    navigator.clipboard.writeText(url)
+    showToast(url)
+  } else if (mode === 'y') {
     const text = entry.el.innerText?.trim() || ''
     navigator.clipboard.writeText(text)
     showToast(text)

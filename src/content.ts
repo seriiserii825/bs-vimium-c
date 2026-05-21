@@ -25,6 +25,7 @@ type Action =
   | "closeTabsRight"
   | "closeTabsOthers"
   | "yankText"
+  | "yankLinkUrl"
   | "yankMultiText"
   | "openMultiLinks"
   | "hoverElement";
@@ -38,6 +39,9 @@ const actions: Record<Action, () => void> = {
   },
   yankText: () => {
     session = beginHints("y");
+  },
+  yankLinkUrl: () => {
+    session = beginHints("yl");
   },
   yankMultiText: () => {
     session = beginHints("ym");
