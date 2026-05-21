@@ -70,27 +70,75 @@ export interface HintSession {
 }
 
 let lastHovered: HTMLElement | null = null
+let hoverStyleEl: HTMLStyleElement | null = null
 
 function dispatchMouse(el: HTMLElement, type: string, x: number, y: number, bubbles = true): void {
   el.dispatchEvent(new MouseEvent(type, { bubbles, cancelable: true, view: window, clientX: x, clientY: y }))
 }
 
-export function unhoverLast(): void {
-  if (!lastHovered) return
-  const el = lastHovered
-  lastHovered = null
-  const r = el.getBoundingClientRect()
-  const cx = r.left + r.width / 2
-  const cy = r.top + r.height / 2
-  dispatchMouse(el, 'mouseout', cx, cy)
-  // mouseleave не всплывает — диспатчим на каждый предок от цели до корня
+function ancestorPath(el: HTMLElement): HTMLElement[] {
   const path: HTMLElement[] = []
   let node: HTMLElement | null = el
   while (node && node !== document.documentElement) {
     path.push(node)
     node = node.parentElement
   }
-  for (const ancestor of path) {
+  return path
+}
+
+// CSS :hover не активируется синтетическими JS-событиями — Chrome обновляет
+// :hover только от реальных OS-событий. Поэтому читаем все CSS-правила страницы,
+// заменяем :hover на [data-bs-hover] и инжектируем как отдельный <style> тег.
+function extractHoverRules(ruleList: CSSRuleList): string[] {
+  const result: string[] = []
+  for (const rule of Array.from(ruleList)) {
+    if (rule instanceof CSSStyleRule && rule.selectorText.includes(':hover')) {
+      const newSel = rule.selectorText.replace(/:hover\b/g, '[data-bs-hover]')
+      result.push(`${newSel} { ${rule.style.cssText} }`)
+    } else if (rule instanceof CSSMediaRule) {
+      const inner = extractHoverRules(rule.cssRules)
+      if (inner.length > 0) {
+        result.push(`@media ${rule.conditionText} { ${inner.join('\n')} }`)
+      }
+    }
+  }
+  return result
+}
+
+function activateCSSHover(el: HTMLElement): void {
+  const path = ancestorPath(el)
+  for (const a of path) a.dataset.bsHover = '1'
+
+  const rules: string[] = []
+  for (const sheet of Array.from(document.styleSheets)) {
+    try { rules.push(...extractHoverRules(sheet.cssRules)) } catch { /* cross-origin */ }
+  }
+  if (rules.length === 0) return
+  hoverStyleEl = document.createElement('style')
+  hoverStyleEl.textContent = rules.join('\n')
+  document.head.appendChild(hoverStyleEl)
+}
+
+function deactivateCSSHover(): void {
+  for (const el of Array.from(document.querySelectorAll<HTMLElement>('[data-bs-hover]'))) {
+    delete el.dataset.bsHover
+  }
+  hoverStyleEl?.remove()
+  hoverStyleEl = null
+}
+
+export function unhoverLast(): void {
+  if (!lastHovered) return
+  const el = lastHovered
+  lastHovered = null
+
+  deactivateCSSHover()
+
+  const r = el.getBoundingClientRect()
+  const cx = r.left + r.width / 2
+  const cy = r.top + r.height / 2
+  dispatchMouse(el, 'mouseout', cx, cy)
+  for (const ancestor of ancestorPath(el)) {
     dispatchMouse(ancestor, 'mouseleave', cx, cy, false)
   }
 }
@@ -169,14 +217,10 @@ function activate(entry: HintEntry, mode: HintMode): void {
     const r = entry.el.getBoundingClientRect()
     const cx = r.left + r.width / 2
     const cy = r.top + r.height / 2
-    // mouseenter не всплывает — диспатчим его на каждый предок от корня до цели,
-    // имитируя реальное движение мыши (иначе слушатели на родителях не сработают)
-    const path: HTMLElement[] = []
-    let node: HTMLElement | null = entry.el
-    while (node && node !== document.documentElement) {
-      path.unshift(node)
-      node = node.parentElement
-    }
+    // CSS :hover: инжектируем переписанные правила с [data-bs-hover]
+    activateCSSHover(entry.el)
+    // JS-события: mouseenter не всплывает, поэтому диспатчим от корня до цели
+    const path = ancestorPath(entry.el).reverse()
     for (const ancestor of path) {
       dispatchMouse(ancestor, 'mouseenter', cx, cy, false)
     }
