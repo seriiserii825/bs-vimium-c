@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Move Tab to Window</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: monospace;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 14px;
+    }
+    h3 {
+      color: #9cdcfe;
+      font-size: 12px;
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+    }
+    .item {
+      display: flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      gap: 12px;
+    }
+    .item:hover {
+      background: #2a2d2e;
+    }
+    .key {
+      background: #264f78;
+      color: #9cdcfe;
+      font-weight: bold;
+      font-size: 13px;
+      padding: 1px 7px;
+      border-radius: 3px;
+      min-width: 24px;
+      text-align: center;
+    }
+    .title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 13px;
+    }
+    .count {
+      color: #6a9955;
+      font-size: 11px;
+    }
+    .tabs {
+      margin: 4px 0 6px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tab-title {
+      font-size: 11px;
+      color: #888;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tab-title.is-active {
+      color: #ce9178;
+    }
+    .hint {
+      margin-top: 10px;
+      color: #555;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <h3>MOVE TAB TO WINDOW</h3>
+  <div id="list"></div>
+  <div class="hint">press key or click · esc to cancel</div>
+  <script src="picker.js"></script>
+</body>
+</html>

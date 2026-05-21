@@ -36,9 +36,9 @@ export default defineConfig({
       name: 'build-background',
       async closeBundle() {
         await esbuild({
-          entryPoints: ['src/background.ts'],
+          entryPoints: ['src/background.ts', 'src/picker.ts'],
           bundle: true,
-          outfile: 'dist/background.js',
+          outdir: 'dist',
           format: 'iife',
           platform: 'browser',
         })
@@ -48,6 +48,7 @@ export default defineConfig({
       name: 'copy-manifest',
       closeBundle() {
         copyFileSync('manifest.json', 'dist/manifest.json')
+        copyFileSync('src/picker.html', 'dist/picker.html')
       },
     },
   ],

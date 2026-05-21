@@ -1,5 +1,39 @@
-chrome.runtime.onMessage.addListener((msg: { type: string; url?: string }) => {
+chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number }) => {
   const type = msg.type;
+
+  if (type === "moveTabToWindow") {
+    (async () => {
+      const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      const allWindows = await chrome.windows.getAll({ populate: true });
+      const otherWindows = allWindows.filter(w => w.id !== currentTab.windowId);
+      if (otherWindows.length === 0) return;
+      await chrome.storage.session.set({
+        currentTabId: currentTab.id,
+        windows: otherWindows.map(w => ({
+          id: w.id,
+          tabCount: w.tabs!.length,
+          tabs: w.tabs!.map(t => ({ title: t.title || t.url || "New Tab", active: t.active })),
+        })),
+      });
+      chrome.windows.create({
+        url: chrome.runtime.getURL("picker.html"),
+        type: "popup",
+        width: 520,
+        height: 360,
+        focused: true,
+      });
+    })();
+    return;
+  }
+
+  if (type === "moveTabConfirm" && msg.currentTabId !== undefined && msg.targetWindowId !== undefined) {
+    (async () => {
+      await chrome.tabs.move(msg.currentTabId!, { windowId: msg.targetWindowId!, index: -1 });
+      await chrome.tabs.update(msg.currentTabId!, { active: true });
+      await chrome.windows.update(msg.targetWindowId!, { focused: true });
+    })();
+    return;
+  }
 
   if (type === "downloadImage" && msg.url) {
     chrome.downloads.download({ url: msg.url });

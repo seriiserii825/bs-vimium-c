@@ -35,4 +35,5 @@ da,closeTabsOthers,Close all other tabs
 ge,goExtensions,Go to chrome://extensions
 gk,goExtensionShortcuts,Go to extension shortcuts
 gd,goDownloads,Go to downloads
+W,moveTabToWindow,Move tab to another window
 ?,showHelp,Show keyboard shortcuts

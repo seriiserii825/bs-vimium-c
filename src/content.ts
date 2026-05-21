@@ -46,7 +46,8 @@ type Action =
   | "editUrlNewTab"
   | "downloadImage"
   | "copyImage"
-  | "openImage";
+  | "openImage"
+  | "moveTabToWindow";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -126,6 +127,7 @@ const actions: Record<Action, () => void> = {
   reloadTabHard:    () => { chrome.runtime.sendMessage({ type: "reloadTabHard" }) },
   closeTabsRight:   () => { chrome.runtime.sendMessage({ type: "closeTabsRight" }) },
   closeTabsOthers:  () => { chrome.runtime.sendMessage({ type: "closeTabsOthers" }) },
+  moveTabToWindow:  () => { chrome.runtime.sendMessage({ type: "moveTabToWindow" }) },
 };
 
 // Actions that scroll continuously — need keyup to stop
