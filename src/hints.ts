@@ -4,14 +4,12 @@ import { showToast } from './toast'
 const CHARS = 'sadfjklewcmpgh'
 
 function getCopyable(): HTMLElement[] {
-  const all = Array.from(document.querySelectorAll<HTMLElement>(
-    'p, h1, h2, h3, h4, h5, h6, li, td, th, span, a, button, label, dt, dd, blockquote, caption, figcaption, code, pre'
-  ))
-  return all.filter(el => {
-    const text = el.innerText?.trim()
-    if (!text) return false
-    // skip if all text is just from children already in the list
-    return isVisible(el)
+  return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {
+    if (!isVisible(el)) return false
+    for (const child of Array.from(el.childNodes)) {
+      if (child.nodeType === Node.TEXT_NODE && child.textContent?.trim()) return true
+    }
+    return false
   })
 }
 
