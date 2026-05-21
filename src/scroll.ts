@@ -22,14 +22,14 @@ export function scrollToTop(): void {
   vel = 0;
   active = false;
   if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: "instant" });
 }
 
 export function scrollToBottom(): void {
   vel = 0;
   active = false;
   if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
-  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" });
 }
 
 function tick(now: number): void {
