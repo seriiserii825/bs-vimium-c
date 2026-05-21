@@ -1,0 +1,24 @@
+{
+  "name": "bs-vimium-c",
+  "version": "0.1.0",
+  "scripts": {
+    "prebuild": "tsc --noEmit && eslint .",
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "type:check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.50.1",
+    "vite": "^5.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "eslint": "^9.39.2",
+    "prettier": "^3.8.1"
+  },
+  "engines": {
+    "node": "22.*"
+  }
+}
