@@ -83,7 +83,16 @@ export function unhoverLast(): void {
   const cx = r.left + r.width / 2
   const cy = r.top + r.height / 2
   dispatchMouse(el, 'mouseout', cx, cy)
-  dispatchMouse(el, 'mouseleave', cx, cy, false)
+  // mouseleave не всплывает — диспатчим на каждый предок от цели до корня
+  const path: HTMLElement[] = []
+  let node: HTMLElement | null = el
+  while (node && node !== document.documentElement) {
+    path.push(node)
+    node = node.parentElement
+  }
+  for (const ancestor of path) {
+    dispatchMouse(ancestor, 'mouseleave', cx, cy, false)
+  }
 }
 
 function getHoverable(): HTMLElement[] {
@@ -160,8 +169,18 @@ function activate(entry: HintEntry, mode: HintMode): void {
     const r = entry.el.getBoundingClientRect()
     const cx = r.left + r.width / 2
     const cy = r.top + r.height / 2
+    // mouseenter не всплывает — диспатчим его на каждый предок от корня до цели,
+    // имитируя реальное движение мыши (иначе слушатели на родителях не сработают)
+    const path: HTMLElement[] = []
+    let node: HTMLElement | null = entry.el
+    while (node && node !== document.documentElement) {
+      path.unshift(node)
+      node = node.parentElement
+    }
+    for (const ancestor of path) {
+      dispatchMouse(ancestor, 'mouseenter', cx, cy, false)
+    }
     dispatchMouse(entry.el, 'mouseover', cx, cy)
-    dispatchMouse(entry.el, 'mouseenter', cx, cy, false)
     dispatchMouse(entry.el, 'mousemove', cx, cy)
   } else {
     entry.el.focus()
