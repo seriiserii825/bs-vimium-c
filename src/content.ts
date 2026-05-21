@@ -1,7 +1,9 @@
 import "./hints.css";
 import "./help.css";
+import "./prompt.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
+import { showPrompt, hidePrompt, isPromptVisible } from "./prompt";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -39,7 +41,9 @@ type Action =
   | "yankMultiText"
   | "openMultiLinks"
   | "hoverElement"
-  | "showHelp";
+  | "showHelp"
+  | "editUrlCurrentTab"
+  | "editUrlNewTab";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -68,6 +72,16 @@ const actions: Record<Action, () => void> = {
   },
   showHelp: () => {
     showHelp(mappings);
+  },
+  editUrlCurrentTab: () => {
+    showPrompt("Open URL in current tab", window.location.href, (url) => {
+      window.location.href = url;
+    });
+  },
+  editUrlNewTab: () => {
+    showPrompt("Open URL in new tab", window.location.href, (url) => {
+      chrome.runtime.sendMessage({ type: "navigateTo", url });
+    });
   },
   scrollDown: () => {
     startScroll(1);
@@ -164,6 +178,11 @@ document.addEventListener(
       return;
     }
 
+    if (isPromptVisible()) {
+      if (e.key === "Escape") { hidePrompt(); e.preventDefault(); }
+      return;
+    }
+
     if (session) {
       e.preventDefault();
       e.stopPropagation();
@@ -176,6 +195,7 @@ document.addEventListener(
     }
 
     if (e.key === "Escape") {
+      if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
       unhoverLast();

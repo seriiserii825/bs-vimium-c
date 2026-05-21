@@ -1,0 +1,43 @@
+#bs-vimium-prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2147483646;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18vh;
+}
+
+#bs-vimium-prompt {
+  background: #1e1e2e;
+  border: 1px solid #45475a;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  width: 640px;
+  overflow: hidden;
+}
+
+#bs-vimium-prompt-label {
+  padding: 12px 18px 8px;
+  font-size: 13px;
+  font-family: sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6c7086;
+}
+
+#bs-vimium-prompt-input {
+  display: block;
+  width: 100%;
+  background: #181825;
+  border: none;
+  border-top: 1px solid #313244;
+  color: #cdd6f4;
+  font-size: 17px;
+  font-family: monospace;
+  padding: 16px 18px;
+  outline: none;
+  box-sizing: border-box;
+}

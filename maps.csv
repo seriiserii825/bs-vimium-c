@@ -28,6 +28,8 @@ R,reloadTabHard,Reload tab bypassing cache
 dr,closeTabsRight,Close tabs to the right
 da,closeTabsOthers,Close all other tabs
 ge,goExtensions,Go to chrome://extensions
+eu,editUrlCurrentTab,Edit URL and open in current tab
+eU,editUrlNewTab,Edit URL and open in new tab
 gk,goExtensionShortcuts,Go to extension shortcuts
 gd,goDownloads,Go to downloads
 ?,showHelp,Show keyboard shortcuts
