@@ -3,11 +3,13 @@ import "./help.css";
 import "./prompt.css";
 import "./whichkey.css";
 import "./cookieconfirm.css";
+import "./imageinfo.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
 import { showPrompt, hidePrompt, isPromptVisible } from "./prompt";
 import { showWhichKey, hideWhichKey, isWhichKeyVisible } from "./whichkey";
 import { showCookieConfirm, hideCookieConfirm, isCookieConfirmVisible } from "./cookieconfirm";
+import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -52,7 +54,8 @@ type Action =
   | "copyImage"
   | "openImage"
   | "moveTabToWindow"
-  | "deleteCookiesRefresh";
+  | "deleteCookiesRefresh"
+  | "imageInfo";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -133,6 +136,9 @@ const actions: Record<Action, () => void> = {
   closeTabsRight:   () => { chrome.runtime.sendMessage({ type: "closeTabsRight" }) },
   closeTabsOthers:  () => { chrome.runtime.sendMessage({ type: "closeTabsOthers" }) },
   moveTabToWindow:  () => { chrome.runtime.sendMessage({ type: "moveTabToWindow" }) },
+  imageInfo: () => {
+    session = beginHints("ii");
+  },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
@@ -216,6 +222,7 @@ document.addEventListener(
     if (e.key === "Escape") {
       if (isWhichKeyVisible()) { clearPending(); e.preventDefault(); return; }
       if (isCookieConfirmVisible()) { hideCookieConfirm(); e.preventDefault(); return; }
+      if (isImageInfoVisible()) { hideImageInfo(); e.preventDefault(); return; }
       if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();

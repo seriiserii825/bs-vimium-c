@@ -16,6 +16,7 @@ ymv,yankMultiText,Copy multiple elements
 ci,copyImage,Copy image to clipboard
 oi,openImage,Open image in new tab
 di,downloadImage,Download image
+ii,imageInfo,Show image info popup
 eu,editUrlCurrentTab,Edit URL and open in current tab
 eU,editUrlNewTab,Edit URL and open in new tab
 gu,goUpUrl,Go one level up in URL

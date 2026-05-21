@@ -1,4 +1,5 @@
 import { showToast } from './toast'
+import { showImageInfo } from './imageinfo'
 
 // Home-row first for comfortable typing
 const CHARS = 'sadfjklewcmpgh'
@@ -52,7 +53,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oi'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oi' | 'ii'
 
 export interface HintEntry {
   el: HTMLElement
@@ -155,7 +156,7 @@ export function beginHints(mode: HintMode): HintSession | null {
     : mode === 'yi' ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
-    : (mode === 'di' || mode === 'ci' || mode === 'oi') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
+    : (mode === 'di' || mode === 'ci' || mode === 'oi' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : getClickable()
   if (elements.length === 0) return null
@@ -267,7 +268,9 @@ async function copyImageToClipboard(src: string): Promise<void> {
 }
 
 function activate(entry: HintEntry, mode: HintMode): void {
-  if (mode === 'di') {
+  if (mode === 'ii') {
+    showImageInfo(entry.el as HTMLImageElement)
+  } else if (mode === 'di') {
     const src = (entry.el as HTMLImageElement).src
     if (src) chrome.runtime.sendMessage({ type: 'downloadImage', url: src })
   } else if (mode === 'oi') {
