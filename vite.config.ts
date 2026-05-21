@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import { copyFileSync } from 'fs'
+import { build as esbuild } from 'esbuild'
 
 export default defineConfig({
   build: {
@@ -29,6 +30,18 @@ export default defineConfig({
             return { hotkey, action, description }
           })
         return { code: `export default ${JSON.stringify(data)}`, map: null }
+      },
+    },
+    {
+      name: 'build-background',
+      async closeBundle() {
+        await esbuild({
+          entryPoints: ['src/background.ts'],
+          bundle: true,
+          outfile: 'dist/background.js',
+          format: 'iife',
+          platform: 'browser',
+        })
       },
     },
     {

@@ -5,3 +5,5 @@ j,scrollDown,Scroll down
 k,scrollUp,Scroll up
 gg,scrollToTop,Scroll to top of page
 G,scrollToBottom,Scroll to bottom of page
+J,prevTab,Switch to previous tab
+K,nextTab,Switch to next tab
