@@ -43,7 +43,10 @@ type Action =
   | "hoverElement"
   | "showHelp"
   | "editUrlCurrentTab"
-  | "editUrlNewTab";
+  | "editUrlNewTab"
+  | "downloadImage"
+  | "copyImage"
+  | "openImage";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -73,6 +76,9 @@ const actions: Record<Action, () => void> = {
   showHelp: () => {
     showHelp(mappings);
   },
+  downloadImage: () => { session = beginHints("di"); },
+  copyImage:     () => { session = beginHints("ci"); },
+  openImage:     () => { session = beginHints("oi"); },
   editUrlCurrentTab: () => {
     showPrompt("Open URL in current tab", window.location.href, (url) => {
       window.location.href = url;

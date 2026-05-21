@@ -27,6 +27,9 @@ r,reloadTab,Reload current tab
 R,reloadTabHard,Reload tab bypassing cache
 dr,closeTabsRight,Close tabs to the right
 da,closeTabsOthers,Close all other tabs
+di,downloadImage,Download image
+ci,copyImage,Copy image to clipboard
+oi,openImage,Open image in new tab
 ge,goExtensions,Go to chrome://extensions
 eu,editUrlCurrentTab,Edit URL and open in current tab
 eU,editUrlNewTab,Edit URL and open in new tab

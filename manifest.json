@@ -3,7 +3,7 @@
   "name": "bs-vimium-c",
   "version": "0.1.0",
   "description": "Keyboard-driven browser navigation",
-  "permissions": ["tabs", "sessions"],
+  "permissions": ["tabs", "sessions", "downloads"],
   "background": {
     "service_worker": "background.js"
   },

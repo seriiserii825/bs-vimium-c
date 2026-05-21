@@ -52,7 +52,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oi'
 
 export interface HintEntry {
   el: HTMLElement
@@ -155,6 +155,7 @@ export function beginHints(mode: HintMode): HintSession | null {
     : mode === 'yi' ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
+    : (mode === 'di' || mode === 'ci' || mode === 'oi') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : getClickable()
   if (elements.length === 0) return null
@@ -242,8 +243,40 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
   return visible > 0 ? 'continue' : 'cancel'
 }
 
+async function copyImageToClipboard(src: string): Promise<void> {
+  try {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve()
+      img.onerror = () => reject()
+      img.src = src
+    })
+    const canvas = document.createElement('canvas')
+    canvas.width = img.naturalWidth
+    canvas.height = img.naturalHeight
+    canvas.getContext('2d')!.drawImage(img, 0, 0)
+    const blob = await new Promise<Blob>((resolve, reject) =>
+      canvas.toBlob(b => b ? resolve(b) : reject(), 'image/png')
+    )
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+    showToast('Image copied')
+  } catch {
+    showToast('Copy failed (CORS)')
+  }
+}
+
 function activate(entry: HintEntry, mode: HintMode): void {
-  if (mode === 'yl') {
+  if (mode === 'di') {
+    const src = (entry.el as HTMLImageElement).src
+    if (src) chrome.runtime.sendMessage({ type: 'downloadImage', url: src })
+  } else if (mode === 'oi') {
+    const src = (entry.el as HTMLImageElement).src
+    if (src) chrome.runtime.sendMessage({ type: 'navigateTo', url: src })
+  } else if (mode === 'ci') {
+    const src = (entry.el as HTMLImageElement).src
+    if (src) copyImageToClipboard(src)
+  } else if (mode === 'yl') {
     const url = (entry.el as HTMLAnchorElement).href
     navigator.clipboard.writeText(url)
     showToast(url)

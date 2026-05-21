@@ -1,6 +1,11 @@
 chrome.runtime.onMessage.addListener((msg: { type: string; url?: string }) => {
   const type = msg.type;
 
+  if (type === "downloadImage" && msg.url) {
+    chrome.downloads.download({ url: msg.url });
+    return;
+  }
+
   if (type === "openTab" && msg.url) {
     chrome.tabs.create({ url: msg.url, active: false });
     return;
