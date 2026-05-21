@@ -1,0 +1,119 @@
+#bs-cookieconfirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 2147483646;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#bs-cookieconfirm {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  width: 560px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  font-family: monospace;
+  overflow: hidden;
+}
+
+#bs-cookieconfirm-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid #313244;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #f38ba8;
+  flex-shrink: 0;
+}
+
+#bs-cookieconfirm-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 6px 0;
+}
+
+.bs-cookieconfirm-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 20px;
+}
+
+.bs-cookieconfirm-row:hover {
+  background: #313244;
+}
+
+.bs-cookieconfirm-name {
+  font-size: 12px;
+  color: #a6e3a1;
+  flex-shrink: 0;
+  min-width: 140px;
+}
+
+.bs-cookieconfirm-value {
+  font-size: 11px;
+  color: #6c7086;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bs-cookieconfirm-empty {
+  padding: 20px;
+  font-family: sans-serif;
+  font-size: 13px;
+  color: #6c7086;
+  text-align: center;
+}
+
+#bs-cookieconfirm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid #313244;
+  flex-shrink: 0;
+}
+
+#bs-cookieconfirm-count {
+  font-family: sans-serif;
+  font-size: 12px;
+  color: #6c7086;
+  margin-right: auto;
+}
+
+.bs-cookieconfirm-btn {
+  font-family: sans-serif;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid #45475a;
+  background: #313244;
+  color: #cdd6f4;
+  cursor: pointer;
+}
+
+.bs-cookieconfirm-btn:hover {
+  background: #45475a;
+}
+
+.bs-cookieconfirm-btn-danger {
+  background: #c0392b;
+  border-color: #e74c3c;
+  color: #fff;
+}
+
+.bs-cookieconfirm-btn-danger:hover:not(:disabled) {
+  background: #e74c3c;
+}
+
+.bs-cookieconfirm-btn-danger:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

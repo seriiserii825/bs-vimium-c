@@ -32,6 +32,7 @@ r,reloadTab,Reload current tab
 R,reloadTabHard,Reload tab bypassing cache
 dr,closeTabsRight,Close tabs to the right
 da,closeTabsOthers,Close all other tabs
+dc,deleteCookiesRefresh,Delete cookies for domain and refresh
 ge,goExtensions,Go to chrome://extensions
 gk,goExtensionShortcuts,Go to extension shortcuts
 gd,goDownloads,Go to downloads

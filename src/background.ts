@@ -1,5 +1,26 @@
-chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number }) => {
+chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number }, _sender, sendResponse) => {
   const type = msg.type;
+
+  if (type === "getCookies" && msg.url) {
+    chrome.cookies.getAll({ url: msg.url }, (cookies) => {
+      sendResponse({ cookies: cookies.map(c => ({ name: c.name, value: c.value, domain: c.domain, secure: c.secure, path: c.path })) });
+    });
+    return true;
+  }
+
+  if (type === "deleteCookiesRefresh" && msg.url) {
+    (async () => {
+      const cookies = await chrome.cookies.getAll({ url: msg.url! });
+      await Promise.all(cookies.map(c => {
+        const cookieUrl = `${c.secure ? 'https' : 'http'}://${c.domain.startsWith('.') ? c.domain.slice(1) : c.domain}${c.path}`;
+        return chrome.cookies.remove({ url: cookieUrl, name: c.name });
+      }));
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab.id) chrome.tabs.reload(tab.id);
+    })();
+    return;
+  }
+
 
   if (type === "moveTabToWindow") {
     (async () => {

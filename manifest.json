@@ -19,7 +19,8 @@
       "128": "icon128.png"
     }
   },
-  "permissions": ["tabs", "sessions", "downloads", "windows", "storage"],
+  "permissions": ["tabs", "sessions", "downloads", "windows", "storage", "cookies"],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
