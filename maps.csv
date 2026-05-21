@@ -41,4 +41,5 @@ ge,goExtensions,Go to chrome://extensions
 gk,goExtensionShortcuts,Go to extension shortcuts
 gd,goDownloads,Go to downloads
 W,moveTabToWindow,Move tab to another window
+sh,showSeoInfo,Show SEO meta info
 ?,showHelp,Show keyboard shortcuts
