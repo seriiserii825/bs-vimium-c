@@ -7,3 +7,7 @@ gg,scrollToTop,Scroll to top of page
 G,scrollToBottom,Scroll to bottom of page
 J,prevTab,Switch to previous tab
 K,nextTab,Switch to next tab
+>>,moveTabRight,Move tab right
+<<,moveTabLeft,Move tab left
+yt,duplicateTab,Duplicate current tab
+nt,newTab,Open new tab

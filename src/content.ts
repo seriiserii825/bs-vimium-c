@@ -13,7 +13,11 @@ type Action =
   | "scrollToTop"
   | "scrollToBottom"
   | "prevTab"
-  | "nextTab";
+  | "nextTab"
+  | "moveTabRight"
+  | "moveTabLeft"
+  | "duplicateTab"
+  | "newTab";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -30,8 +34,12 @@ const actions: Record<Action, () => void> = {
   },
   scrollToTop: scrollToTop,
   scrollToBottom: scrollToBottom,
-  prevTab: () => { chrome.runtime.sendMessage({ type: "prevTab" }) },
-  nextTab: () => { chrome.runtime.sendMessage({ type: "nextTab" }) },
+  prevTab:      () => { chrome.runtime.sendMessage({ type: "prevTab" }) },
+  nextTab:      () => { chrome.runtime.sendMessage({ type: "nextTab" }) },
+  moveTabRight: () => { chrome.runtime.sendMessage({ type: "moveTabRight" }) },
+  moveTabLeft:  () => { chrome.runtime.sendMessage({ type: "moveTabLeft" }) },
+  duplicateTab: () => { chrome.runtime.sendMessage({ type: "duplicateTab" }) },
+  newTab:       () => { chrome.runtime.sendMessage({ type: "newTab" }) },
 };
 
 // Actions that scroll continuously — need keyup to stop
