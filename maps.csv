@@ -1,15 +1,20 @@
 hotkey,action,description
-f,followLink,Follow link in same tab
-F,followLinkNewTab,Follow link in new tab
 j,scrollDown,Scroll down
 k,scrollUp,Scroll up
 gg,scrollToTop,Scroll to top of page
+G,scrollToBottom,Scroll to bottom of page
+H,historyBack,Go back in history
+L,historyForward,Go forward in history
 gu,goUpUrl,Go one level up in URL
 gU,goRootUrl,Go to root URL
-ge,goExtensions,Go to chrome://extensions
-gk,goExtensionShortcuts,Go to chrome://extensions/shortcuts
-gd,goDownloads,Go to chrome://downloads
-G,scrollToBottom,Scroll to bottom of page
+f,followLink,Follow link in same tab
+F,followLinkNewTab,Follow link in new tab
+oml,openMultiLinks,Open multiple links in new tabs
+A-h,hoverElement,Hover over element
+yv,yankText,Copy text of element
+yl,yankLinkUrl,Copy link URL
+yi,yankInputText,Copy text from input
+ymv,yankMultiText,Copy multiple elements
 J,prevTab,Switch to previous tab
 K,nextTab,Switch to next tab
 >>,moveTabRight,Move tab right
@@ -18,15 +23,11 @@ yt,duplicateTab,Duplicate current tab
 nt,newTab,Open new tab
 x,closeTab,Close current tab
 X,restoreTab,Restore last closed tab
-H,historyBack,Go back in history
-L,historyForward,Go forward in history
 r,reloadTab,Reload current tab
 R,reloadTabHard,Reload tab bypassing cache
 dr,closeTabsRight,Close tabs to the right
-da,closeTabsOthers,Close all tabs except current
-yv,yankText,Yank text of element
-yl,yankLinkUrl,Copy link URL
-yi,yankInputText,Copy text from input or textarea
-ymv,yankMultiText,Yank multiple text elements
-oml,openMultiLinks,Open multiple links in new tabs
-A-h,hoverElement,Hover over element
+da,closeTabsOthers,Close all other tabs
+ge,goExtensions,Go to chrome://extensions
+gk,goExtensionShortcuts,Go to extension shortcuts
+gd,goDownloads,Go to downloads
+?,showHelp,Show keyboard shortcuts

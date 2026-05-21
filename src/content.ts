@@ -1,5 +1,7 @@
 import "./hints.css";
+import "./help.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
+import { showHelp, hideHelp, isHelpVisible } from "./help";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -36,7 +38,8 @@ type Action =
   | "yankInputText"
   | "yankMultiText"
   | "openMultiLinks"
-  | "hoverElement";
+  | "hoverElement"
+  | "showHelp";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -62,6 +65,9 @@ const actions: Record<Action, () => void> = {
   },
   hoverElement: () => {
     session = beginHints("h");
+  },
+  showHelp: () => {
+    showHelp(mappings);
   },
   scrollDown: () => {
     startScroll(1);
@@ -170,6 +176,7 @@ document.addEventListener(
     }
 
     if (e.key === "Escape") {
+      if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
       unhoverLast();
       return;
