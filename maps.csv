@@ -1,0 +1,5 @@
+hotkey,action,description
+f,followLink,Follow link in same tab
+F,followLinkNewTab,Follow link in new tab
+j,scrollDown,Scroll down
+k,scrollUp,Scroll up

@@ -9,13 +9,28 @@ export default defineConfig({
     rollupOptions: {
       input: resolve(__dirname, 'src/content.ts'),
       output: {
-        format: 'iife',       // single self-contained file, no module system needed
+        format: 'iife',
         entryFileNames: 'content.js',
-        assetFileNames: '[name][extname]', // hints.css → content.css
+        assetFileNames: '[name][extname]',
       },
     },
   },
   plugins: [
+    {
+      // Parse maps.csv at build time → JS array, no runtime parsing needed
+      name: 'csv-transform',
+      transform(src, id) {
+        if (!id.endsWith('.csv')) return null
+        const [, ...rows] = src.trim().split('\n') // skip header line
+        const data = rows
+          .filter(r => r.trim())
+          .map(row => {
+            const [hotkey, action, description] = row.split(',').map(s => s.trim())
+            return { hotkey, action, description }
+          })
+        return { code: `export default ${JSON.stringify(data)}`, map: null }
+      },
+    },
     {
       name: 'copy-manifest',
       closeBundle() {
