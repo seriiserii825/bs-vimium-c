@@ -5,8 +5,6 @@ gg,scrollToTop,Scroll to top of page
 G,scrollToBottom,Scroll to bottom of page
 H,historyBack,Go back in history
 L,historyForward,Go forward in history
-gu,goUpUrl,Go one level up in URL
-gU,goRootUrl,Go to root URL
 f,followLink,Follow link in same tab
 F,followLinkNewTab,Follow link in new tab
 oml,openMultiLinks,Open multiple links in new tabs
@@ -15,6 +13,13 @@ yv,yankText,Copy text of element
 yl,yankLinkUrl,Copy link URL
 yi,yankInputText,Copy text from input
 ymv,yankMultiText,Copy multiple elements
+ci,copyImage,Copy image to clipboard
+oi,openImage,Open image in new tab
+di,downloadImage,Download image
+eu,editUrlCurrentTab,Edit URL and open in current tab
+eU,editUrlNewTab,Edit URL and open in new tab
+gu,goUpUrl,Go one level up in URL
+gU,goRootUrl,Go to root URL
 J,prevTab,Switch to previous tab
 K,nextTab,Switch to next tab
 >>,moveTabRight,Move tab right
@@ -27,12 +32,7 @@ r,reloadTab,Reload current tab
 R,reloadTabHard,Reload tab bypassing cache
 dr,closeTabsRight,Close tabs to the right
 da,closeTabsOthers,Close all other tabs
-di,downloadImage,Download image
-ci,copyImage,Copy image to clipboard
-oi,openImage,Open image in new tab
 ge,goExtensions,Go to chrome://extensions
-eu,editUrlCurrentTab,Edit URL and open in current tab
-eU,editUrlNewTab,Edit URL and open in new tab
 gk,goExtensionShortcuts,Go to extension shortcuts
 gd,goDownloads,Go to downloads
 ?,showHelp,Show keyboard shortcuts
