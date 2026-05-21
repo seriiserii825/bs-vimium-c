@@ -27,7 +27,15 @@ function getClickable(): HTMLElement[] {
     '[tabindex]:not([tabindex="-1"])',
   ].join(', ')
 
-  return Array.from(document.querySelectorAll<HTMLElement>(selector)).filter(isVisible)
+  const fromSelector = new Set(Array.from(document.querySelectorAll<HTMLElement>(selector)))
+  const result: HTMLElement[] = []
+  for (const el of Array.from(document.querySelectorAll<HTMLElement>('*'))) {
+    if (!isVisible(el)) continue
+    if (fromSelector.has(el) || window.getComputedStyle(el).cursor === 'pointer') {
+      result.push(el)
+    }
+  }
+  return result
 }
 
 function isVisible(el: HTMLElement): boolean {
