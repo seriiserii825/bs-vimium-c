@@ -52,7 +52,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'ym' | 'om' | 'h'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h'
 
 export interface HintEntry {
   el: HTMLElement
@@ -152,6 +152,9 @@ function getHoverable(): HTMLElement[] {
 export function beginHints(mode: HintMode): HintSession | null {
   const elements = (mode === 'y' || mode === 'ym') ? getCopyable()
     : mode === 'yl' ? Array.from(document.querySelectorAll<HTMLElement>('a[href]')).filter(isVisible)
+    : mode === 'yi' ? Array.from(document.querySelectorAll<HTMLElement>(
+        'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
+      )).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : getClickable()
   if (elements.length === 0) return null
@@ -244,6 +247,11 @@ function activate(entry: HintEntry, mode: HintMode): void {
     const url = (entry.el as HTMLAnchorElement).href
     navigator.clipboard.writeText(url)
     showToast(url)
+  } else if (mode === 'yi') {
+    const el = entry.el as HTMLInputElement | HTMLTextAreaElement
+    const text = el.value.trim() || (el as HTMLInputElement).placeholder?.trim() || ''
+    navigator.clipboard.writeText(text)
+    showToast(text)
   } else if (mode === 'y') {
     const text = entry.el.innerText?.trim() || ''
     navigator.clipboard.writeText(text)

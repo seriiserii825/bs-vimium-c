@@ -19,6 +19,7 @@ dr,closeTabsRight,Close tabs to the right
 da,closeTabsOthers,Close all tabs except current
 yv,yankText,Yank text of element
 yl,yankLinkUrl,Copy link URL
+yi,yankInputText,Copy text from input or textarea
 ymv,yankMultiText,Yank multiple text elements
 oml,openMultiLinks,Open multiple links in new tabs
 A-h,hoverElement,Hover over element
