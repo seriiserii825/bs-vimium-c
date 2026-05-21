@@ -16,6 +16,9 @@ export function showSeoInfo(): void {
   const ogTitle = getMeta('og:title')
   const ogDesc = getMeta('og:description')
   const ogImage = getMeta('og:image')
+  const robots = getMeta('robots')
+  const googlebot = getMeta('googlebot')
+  const isNoindex = robots.toLowerCase().includes('noindex') || googlebot.toLowerCase().includes('noindex')
 
   backdrop = document.createElement('div')
   backdrop.id = 'bs-seo-backdrop'
@@ -42,6 +45,9 @@ export function showSeoInfo(): void {
   addRow(body, 'Description', desc)
   addRow(body, 'OG Title', ogTitle)
   addRow(body, 'OG Desc', ogDesc)
+  addRow(body, 'Robots', robots)
+  if (googlebot) addRow(body, 'Googlebot', googlebot)
+  addStatusRow(body, 'No-index', isNoindex ? 'yes' : 'no', isNoindex ? 'danger' : 'ok')
 
   if (ogImage) {
     const imgRow = document.createElement('div')
@@ -81,6 +87,23 @@ export function showSeoInfo(): void {
   })
 
   document.documentElement.appendChild(backdrop)
+}
+
+function addStatusRow(parent: HTMLElement, label: string, text: string, status: 'ok' | 'danger'): void {
+  const row = document.createElement('div')
+  row.className = 'bs-seo-row'
+
+  const lbl = document.createElement('span')
+  lbl.className = 'bs-seo-label'
+  lbl.textContent = label
+
+  const badge = document.createElement('span')
+  badge.className = `bs-seo-status bs-seo-status-${status}`
+  badge.textContent = text
+
+  row.appendChild(lbl)
+  row.appendChild(badge)
+  parent.appendChild(row)
 }
 
 function addRow(parent: HTMLElement, label: string, value: string): void {
