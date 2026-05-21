@@ -1,17 +1,19 @@
 import "./hints.css";
 import { beginHints, typeHint, endHints, HintSession } from "./hints";
-import { startScroll, stopScroll } from "./scroll";
+import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
 let session: HintSession | null = null;
 
-type Action = "followLink" | "followLinkNewTab" | "scrollDown" | "scrollUp";
+type Action = "followLink" | "followLinkNewTab" | "scrollDown" | "scrollUp" | "scrollToTop" | "scrollToBottom";
 
 const actions: Record<Action, () => void> = {
   followLink:       () => { session = beginHints("f") },
   followLinkNewTab: () => { session = beginHints("F") },
   scrollDown:       () => { startScroll(1) },
   scrollUp:         () => { startScroll(-1) },
+  scrollToTop:      scrollToTop,
+  scrollToBottom:   scrollToBottom,
 };
 
 // Actions that scroll continuously — need keyup to stop
@@ -20,6 +22,19 @@ const continuousActions = new Set<Action>(["scrollDown", "scrollUp"]);
 const keyMap = new Map<string, Action>(
   mappings.map(({ hotkey, action }) => [hotkey, action as Action]),
 );
+
+// Keys that are the first character of a multi-char hotkey
+const prefixKeys = new Set<string>(
+  [...keyMap.keys()].filter(h => h.length > 1).map(h => h[0]),
+);
+
+let pendingPrefix: string | null = null;
+let prefixTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function clearPending(): void {
+  pendingPrefix = null;
+  if (prefixTimeout !== null) { clearTimeout(prefixTimeout); prefixTimeout = null; }
+}
 
 function isEditing(): boolean {
   const el = document.activeElement;
@@ -49,6 +64,24 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
 
   if (isEditing()) return;
   if (e.repeat) return; // ignore OS key-repeat, we handle held keys ourselves
+
+  if (pendingPrefix !== null) {
+    const combo = pendingPrefix + e.key;
+    clearPending();
+    const action = keyMap.get(combo);
+    if (action) {
+      e.preventDefault();
+      actions[action]();
+    }
+    return;
+  }
+
+  if (prefixKeys.has(e.key)) {
+    e.preventDefault();
+    pendingPrefix = e.key;
+    prefixTimeout = setTimeout(clearPending, 1000);
+    return;
+  }
 
   const action = keyMap.get(e.key);
   if (action) {

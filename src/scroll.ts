@@ -18,6 +18,20 @@ export function stopScroll(): void {
   active = false; // tick() will decelerate and stop
 }
 
+export function scrollToTop(): void {
+  vel = 0;
+  active = false;
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+export function scrollToBottom(): void {
+  vel = 0;
+  active = false;
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+}
+
 function tick(now: number): void {
   const dt = Math.min(now - lastTime, 50) / 1000; // seconds, cap for tab switch
   lastTime = now;

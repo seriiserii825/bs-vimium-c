@@ -3,3 +3,5 @@ f,followLink,Follow link in same tab
 F,followLinkNewTab,Follow link in new tab
 j,scrollDown,Scroll down
 k,scrollUp,Scroll up
+gg,scrollToTop,Scroll to top of page
+G,scrollToBottom,Scroll to bottom of page
