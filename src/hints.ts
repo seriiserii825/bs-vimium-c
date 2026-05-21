@@ -52,7 +52,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'ym' | 'h'
+export type HintMode = 'f' | 'F' | 'y' | 'ym' | 'om' | 'h'
 
 export interface HintEntry {
   el: HTMLElement
@@ -206,6 +206,18 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
         session.collected.push(text)
         match.node.classList.add('selected')
       }
+      session.typed = ''
+      for (const entry of session.entries) entry.node.classList.remove('dim')
+      return 'continue'
+    }
+    if (session.mode === 'om') {
+      const el = match.el
+      if (el instanceof HTMLAnchorElement && el.href) {
+        chrome.runtime.sendMessage({ type: 'openTab', url: el.href })
+      } else {
+        el.click()
+      }
+      match.node.classList.add('selected')
       session.typed = ''
       for (const entry of session.entries) entry.node.classList.remove('dim')
       return 'continue'

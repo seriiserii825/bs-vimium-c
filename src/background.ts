@@ -1,5 +1,11 @@
-chrome.runtime.onMessage.addListener((msg: { type: string }) => {
+chrome.runtime.onMessage.addListener((msg: { type: string; url?: string }) => {
   const type = msg.type;
+
+  if (type === "openTab" && msg.url) {
+    chrome.tabs.create({ url: msg.url, active: false });
+    return;
+  }
+
   const knownTypes = new Set(["prevTab","nextTab","moveTabRight","moveTabLeft","duplicateTab","newTab","closeTab","restoreTab","reloadTab","reloadTabHard","closeTabsRight","closeTabsOthers"]);
   if (!knownTypes.has(type)) return;
 

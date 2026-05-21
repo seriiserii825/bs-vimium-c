@@ -26,6 +26,7 @@ type Action =
   | "closeTabsOthers"
   | "yankText"
   | "yankMultiText"
+  | "openMultiLinks"
   | "hoverElement";
 
 const actions: Record<Action, () => void> = {
@@ -40,6 +41,9 @@ const actions: Record<Action, () => void> = {
   },
   yankMultiText: () => {
     session = beginHints("ym");
+  },
+  openMultiLinks: () => {
+    session = beginHints("om");
   },
   hoverElement: () => {
     session = beginHints("h");
