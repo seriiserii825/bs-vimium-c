@@ -61,7 +61,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oI' | 'ii'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oI' | 'ii' | 'ctc' | 'ctmc'
 
 export interface HintEntry {
   el: HTMLElement
@@ -151,6 +151,29 @@ export function unhoverLast(): void {
   }
 }
 
+function getTableColumns(): HTMLElement[] {
+  const result: HTMLElement[] = []
+  for (const table of Array.from(document.querySelectorAll<HTMLTableElement>('table'))) {
+    if (!isVisible(table)) continue
+    const headerRow = table.querySelector('thead tr') ?? table.querySelector('tr')
+    if (!headerRow) continue
+    for (const cell of Array.from((headerRow as HTMLTableRowElement).cells)) {
+      if (isVisible(cell as HTMLElement)) result.push(cell as HTMLElement)
+    }
+  }
+  return result
+}
+
+function getColumnText(cell: HTMLTableCellElement): string {
+  const table = cell.closest('table')
+  if (!table) return cell.innerText.trim()
+  const colIndex = cell.cellIndex
+  return Array.from(table.querySelectorAll('tr'))
+    .map(row => ((row as HTMLTableRowElement).cells[colIndex]?.innerText.trim() ?? ''))
+    .filter(t => t)
+    .join('\n')
+}
+
 function getHoverable(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {
     if (!isVisible(el)) return false
@@ -166,6 +189,7 @@ export function beginHints(mode: HintMode): HintSession | null {
       )).filter(isVisible)
     : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'h' ? getHoverable()
+    : (mode === 'ctc' || mode === 'ctmc') ? getTableColumns()
     : getClickable()
   if (elements.length === 0) return null
 
@@ -194,7 +218,7 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
   if (key === 'Escape') return 'cancel'
 
   // Enter завершает multi-yank и копирует накопленный текст
-  if (key === 'Enter' && session.mode === 'ym') {
+  if (key === 'Enter' && (session.mode === 'ym' || session.mode === 'ctmc')) {
     const collected = session.collected
     if (collected && collected.length > 0) {
       navigator.clipboard.writeText(collected.join('\n'))
@@ -217,6 +241,17 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
   if (match) {
     if (session.mode === 'ym') {
       const text = match.el.innerText?.trim() || ''
+      if (text) {
+        session.collected = session.collected ?? []
+        session.collected.push(text)
+        match.node.classList.add('selected')
+      }
+      session.typed = ''
+      for (const entry of session.entries) entry.node.classList.remove('dim')
+      return 'continue'
+    }
+    if (session.mode === 'ctmc') {
+      const text = getColumnText(match.el as HTMLTableCellElement)
       if (text) {
         session.collected = session.collected ?? []
         session.collected.push(text)
@@ -276,7 +311,11 @@ async function copyImageToClipboard(src: string): Promise<void> {
 }
 
 function activate(entry: HintEntry, mode: HintMode): void {
-  if (mode === 'ii') {
+  if (mode === 'ctc') {
+    const text = getColumnText(entry.el as HTMLTableCellElement)
+    navigator.clipboard.writeText(text)
+    showToast(`Copied ${text.split('\n').length} cells`)
+  } else if (mode === 'ii') {
     showImageInfo(entry.el as HTMLImageElement)
   } else if (mode === 'di') {
     const src = (entry.el as HTMLImageElement).src

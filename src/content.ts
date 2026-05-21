@@ -56,7 +56,9 @@ type Action =
   | "openIncognito"
   | "moveTabToWindow"
   | "deleteCookiesRefresh"
-  | "imageInfo";
+  | "imageInfo"
+  | "copyTableColumn"
+  | "copyTableMultiColumn";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -141,6 +143,8 @@ const actions: Record<Action, () => void> = {
   imageInfo: () => {
     session = beginHints("ii");
   },
+  copyTableColumn: () => { session = beginHints("ctc"); },
+  copyTableMultiColumn: () => { session = beginHints("ctmc"); },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
