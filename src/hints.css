@@ -29,3 +29,31 @@
 .bs-vimium-hint.matched {
   background: #88ff00;
 }
+
+#bs-vimium-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: darkgreen;
+  color: #fff;
+  font: 13px/1.4 sans-serif;
+  padding: 14px 24px;
+  border-radius: 6px;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+  max-width: 360px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+#bs-vimium-toast.bs-vimium-toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}

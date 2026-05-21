@@ -23,7 +23,8 @@ type Action =
   | "reloadTab"
   | "reloadTabHard"
   | "closeTabsRight"
-  | "closeTabsOthers";
+  | "closeTabsOthers"
+  | "yankText";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -31,6 +32,9 @@ const actions: Record<Action, () => void> = {
   },
   followLinkNewTab: () => {
     session = beginHints("F");
+  },
+  yankText: () => {
+    session = beginHints("y");
   },
   scrollDown: () => {
     startScroll(1);

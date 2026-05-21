@@ -1,5 +1,19 @@
+import { showToast } from './toast'
+
 // Home-row first for comfortable typing
 const CHARS = 'sadfjklewcmpgh'
+
+function getCopyable(): HTMLElement[] {
+  const all = Array.from(document.querySelectorAll<HTMLElement>(
+    'p, h1, h2, h3, h4, h5, h6, li, td, th, span, a, button, label, dt, dd, blockquote, caption, figcaption, code, pre'
+  ))
+  return all.filter(el => {
+    const text = el.innerText?.trim()
+    if (!text) return false
+    // skip if all text is just from children already in the list
+    return isVisible(el)
+  })
+}
 
 function getClickable(): HTMLElement[] {
   const selector = [
@@ -40,7 +54,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F'
+export type HintMode = 'f' | 'F' | 'y'
 
 export interface HintEntry {
   el: HTMLElement
@@ -56,7 +70,7 @@ export interface HintSession {
 }
 
 export function beginHints(mode: HintMode): HintSession | null {
-  const elements = getClickable()
+  const elements = mode === 'y' ? getCopyable() : getClickable()
   if (elements.length === 0) return null
 
   const labels = generateLabels(elements.length)
@@ -110,7 +124,11 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
 }
 
 function activate(entry: HintEntry, mode: HintMode): void {
-  if (mode === 'F' && entry.el instanceof HTMLAnchorElement && entry.el.href) {
+  if (mode === 'y') {
+    const text = entry.el.innerText?.trim() || ''
+    navigator.clipboard.writeText(text)
+    showToast(text)
+  } else if (mode === 'F' && entry.el instanceof HTMLAnchorElement && entry.el.href) {
     window.open(entry.el.href, '_blank')
   } else {
     entry.el.focus()
