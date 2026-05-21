@@ -1,6 +1,7 @@
 chrome.runtime.onMessage.addListener((msg: { type: string }) => {
   const type = msg.type;
-  if (type !== "prevTab" && type !== "nextTab" && type !== "moveTabRight" && type !== "moveTabLeft" && type !== "duplicateTab" && type !== "newTab") return;
+  const knownTypes = new Set(["prevTab","nextTab","moveTabRight","moveTabLeft","duplicateTab","newTab","closeTab","restoreTab","reloadTab","reloadTabHard","closeTabsRight","closeTabsOthers"]);
+  if (!knownTypes.has(type)) return;
 
   chrome.tabs.query({ currentWindow: true }, (tabs) => {
     const sorted = tabs
@@ -25,6 +26,20 @@ chrome.runtime.onMessage.addListener((msg: { type: string }) => {
       chrome.tabs.duplicate(sorted[activeIdx].id!);
     } else if (type === "newTab") {
       chrome.tabs.create({});
+    } else if (type === "closeTab") {
+      chrome.tabs.remove(sorted[activeIdx].id!);
+    } else if (type === "restoreTab") {
+      chrome.sessions.restore();
+    } else if (type === "reloadTab") {
+      chrome.tabs.reload(sorted[activeIdx].id!);
+    } else if (type === "reloadTabHard") {
+      chrome.tabs.reload(sorted[activeIdx].id!, { bypassCache: true });
+    } else if (type === "closeTabsRight") {
+      const toClose = sorted.slice(activeIdx + 1).map(t => t.id!);
+      if (toClose.length) chrome.tabs.remove(toClose);
+    } else if (type === "closeTabsOthers") {
+      const toClose = sorted.filter((_, i) => i !== activeIdx).map(t => t.id!);
+      if (toClose.length) chrome.tabs.remove(toClose);
     }
   });
 });

@@ -17,7 +17,13 @@ type Action =
   | "moveTabRight"
   | "moveTabLeft"
   | "duplicateTab"
-  | "newTab";
+  | "newTab"
+  | "closeTab"
+  | "restoreTab"
+  | "reloadTab"
+  | "reloadTabHard"
+  | "closeTabsRight"
+  | "closeTabsOthers";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -38,8 +44,14 @@ const actions: Record<Action, () => void> = {
   nextTab:      () => { chrome.runtime.sendMessage({ type: "nextTab" }) },
   moveTabRight: () => { chrome.runtime.sendMessage({ type: "moveTabRight" }) },
   moveTabLeft:  () => { chrome.runtime.sendMessage({ type: "moveTabLeft" }) },
-  duplicateTab: () => { chrome.runtime.sendMessage({ type: "duplicateTab" }) },
-  newTab:       () => { chrome.runtime.sendMessage({ type: "newTab" }) },
+  duplicateTab:     () => { chrome.runtime.sendMessage({ type: "duplicateTab" }) },
+  newTab:           () => { chrome.runtime.sendMessage({ type: "newTab" }) },
+  closeTab:         () => { chrome.runtime.sendMessage({ type: "closeTab" }) },
+  restoreTab:       () => { chrome.runtime.sendMessage({ type: "restoreTab" }) },
+  reloadTab:        () => { chrome.runtime.sendMessage({ type: "reloadTab" }) },
+  reloadTabHard:    () => { chrome.runtime.sendMessage({ type: "reloadTabHard" }) },
+  closeTabsRight:   () => { chrome.runtime.sendMessage({ type: "closeTabsRight" }) },
+  closeTabsOthers:  () => { chrome.runtime.sendMessage({ type: "closeTabsOthers" }) },
 };
 
 // Actions that scroll continuously — need keyup to stop
@@ -88,6 +100,11 @@ document.addEventListener(
         endHints(session);
         session = null;
       }
+      return;
+    }
+
+    if (e.key === "Escape") {
+      (document.activeElement as HTMLElement)?.blur();
       return;
     }
 
