@@ -56,6 +56,14 @@ chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; current
     return;
   }
 
+  if (type === "openIncognito") {
+    (async () => {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab.url) chrome.windows.create({ url: tab.url, incognito: true });
+    })();
+    return;
+  }
+
   if (type === "downloadImage" && msg.url) {
     chrome.downloads.download({ url: msg.url });
     return;

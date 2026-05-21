@@ -61,7 +61,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oi' | 'ii'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oI' | 'ii'
 
 export interface HintEntry {
   el: HTMLElement
@@ -164,7 +164,7 @@ export function beginHints(mode: HintMode): HintSession | null {
     : mode === 'yi' ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
-    : (mode === 'di' || mode === 'ci' || mode === 'oi' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
+    : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : getClickable()
   if (elements.length === 0) return null
@@ -281,7 +281,7 @@ function activate(entry: HintEntry, mode: HintMode): void {
   } else if (mode === 'di') {
     const src = (entry.el as HTMLImageElement).src
     if (src) chrome.runtime.sendMessage({ type: 'downloadImage', url: src })
-  } else if (mode === 'oi') {
+  } else if (mode === 'oI') {
     const src = (entry.el as HTMLImageElement).src
     if (src) chrome.runtime.sendMessage({ type: 'navigateTo', url: src })
   } else if (mode === 'ci') {

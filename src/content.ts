@@ -53,6 +53,7 @@ type Action =
   | "downloadImage"
   | "copyImage"
   | "openImage"
+  | "openIncognito"
   | "moveTabToWindow"
   | "deleteCookiesRefresh"
   | "imageInfo";
@@ -87,7 +88,8 @@ const actions: Record<Action, () => void> = {
   },
   downloadImage: () => { session = beginHints("di"); },
   copyImage:     () => { session = beginHints("ci"); },
-  openImage:     () => { session = beginHints("oi"); },
+  openImage:     () => { session = beginHints("oI"); },
+  openIncognito: () => { chrome.runtime.sendMessage({ type: "openIncognito" }) },
   editUrlCurrentTab: () => {
     showPrompt("Open URL in current tab", window.location.href, (url) => {
       window.location.href = url;

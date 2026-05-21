@@ -14,7 +14,8 @@ yl,yankLinkUrl,Copy link URL
 yi,yankInputText,Copy text from input
 ymv,yankMultiText,Copy multiple elements
 ci,copyImage,Copy image to clipboard
-oi,openImage,Open image in new tab
+oI,openImage,Open image in new tab
+oi,openIncognito,Open current tab in incognito window
 di,downloadImage,Download image
 ii,imageInfo,Show image info popup
 eu,editUrlCurrentTab,Edit URL and open in current tab
