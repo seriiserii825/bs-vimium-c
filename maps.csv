@@ -4,6 +4,11 @@ F,followLinkNewTab,Follow link in new tab
 j,scrollDown,Scroll down
 k,scrollUp,Scroll up
 gg,scrollToTop,Scroll to top of page
+gu,goUpUrl,Go one level up in URL
+gU,goRootUrl,Go to root URL
+ge,goExtensions,Go to chrome://extensions
+gk,goExtensionShortcuts,Go to chrome://extensions/shortcuts
+gd,goDownloads,Go to chrome://downloads
 G,scrollToBottom,Scroll to bottom of page
 J,prevTab,Switch to previous tab
 K,nextTab,Switch to next tab

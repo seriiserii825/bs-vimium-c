@@ -12,6 +12,11 @@ type Action =
   | "scrollUp"
   | "scrollToTop"
   | "scrollToBottom"
+  | "goUpUrl"
+  | "goRootUrl"
+  | "goExtensions"
+  | "goExtensionShortcuts"
+  | "goDownloads"
   | "prevTab"
   | "nextTab"
   | "moveTabRight"
@@ -64,6 +69,21 @@ const actions: Record<Action, () => void> = {
   },
   scrollToTop: scrollToTop,
   scrollToBottom: scrollToBottom,
+  goUpUrl: () => {
+    const url = new URL(window.location.href);
+    const path = url.pathname.replace(/\/$/, "");
+    const up = path.lastIndexOf("/");
+    url.pathname = up >= 0 ? path.slice(0, up) + "/" : "/";
+    url.search = "";
+    url.hash = "";
+    window.location.href = url.href;
+  },
+  goRootUrl: () => {
+    window.location.href = window.location.origin + "/";
+  },
+  goExtensions:         () => { chrome.runtime.sendMessage({ type: "navigateTo", url: "chrome://extensions/" }) },
+  goExtensionShortcuts: () => { chrome.runtime.sendMessage({ type: "navigateTo", url: "chrome://extensions/shortcuts" }) },
+  goDownloads:          () => { chrome.runtime.sendMessage({ type: "navigateTo", url: "chrome://downloads/" }) },
   prevTab:      () => { chrome.runtime.sendMessage({ type: "prevTab" }) },
   nextTab:      () => { chrome.runtime.sendMessage({ type: "nextTab" }) },
   moveTabRight: () => { chrome.runtime.sendMessage({ type: "moveTabRight" }) },
@@ -121,6 +141,8 @@ function isEditing(): boolean {
 document.addEventListener(
   "keydown",
   (e: KeyboardEvent) => {
+    if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'NumLock', 'ScrollLock', 'AltGraph'].includes(e.key)) return;
+
     if (e.ctrlKey || e.metaKey) return;
 
     if (e.altKey) {
