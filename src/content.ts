@@ -5,6 +5,7 @@ import "./whichkey.css";
 import "./cookieconfirm.css";
 import "./imageinfo.css";
 import "./seoinfo.css";
+import "./seoheadings.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
 import { showPrompt, hidePrompt, isPromptVisible } from "./prompt";
@@ -12,6 +13,7 @@ import { showWhichKey, hideWhichKey, isWhichKeyVisible } from "./whichkey";
 import { showCookieConfirm, hideCookieConfirm, isCookieConfirmVisible } from "./cookieconfirm";
 import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { showSeoInfo, hideSeoInfo, isSeoInfoVisible } from "./seoinfo";
+import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seoheadings";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -61,7 +63,8 @@ type Action =
   | "imageInfo"
   | "copyTableColumn"
   | "copyTableMultiColumn"
-  | "showSeoInfo";
+  | "showSeoInfo"
+  | "showSeoHeadings";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -149,6 +152,7 @@ const actions: Record<Action, () => void> = {
   copyTableColumn: () => { session = beginHints("ctc"); },
   copyTableMultiColumn: () => { session = beginHints("ctmc"); },
   showSeoInfo: () => { showSeoInfo(); },
+  showSeoHeadings: () => { showSeoHeadings(); },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
@@ -234,6 +238,7 @@ document.addEventListener(
       if (isCookieConfirmVisible()) { hideCookieConfirm(); e.preventDefault(); return; }
       if (isImageInfoVisible()) { hideImageInfo(); e.preventDefault(); return; }
       if (isSeoInfoVisible()) { hideSeoInfo(); e.preventDefault(); return; }
+      if (isSeoHeadingsVisible()) { hideSeoHeadings(); e.preventDefault(); return; }
       if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
