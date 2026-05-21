@@ -49,6 +49,10 @@ export default defineConfig({
       closeBundle() {
         copyFileSync('manifest.json', 'dist/manifest.json')
         copyFileSync('src/picker.html', 'dist/picker.html')
+        copyFileSync('src/icons/icon16.png', 'dist/icon16.png')
+        copyFileSync('src/icons/icon32.png', 'dist/icon32.png')
+        copyFileSync('src/icons/icon48.png', 'dist/icon48.png')
+        copyFileSync('src/icons/icon128.png', 'dist/icon128.png')
       },
     },
   ],
