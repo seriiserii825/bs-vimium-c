@@ -52,7 +52,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'h'
+export type HintMode = 'f' | 'F' | 'y' | 'ym' | 'h'
 
 export interface HintEntry {
   el: HTMLElement
@@ -65,6 +65,7 @@ export interface HintSession {
   entries: HintEntry[]
   typed: string
   container: HTMLElement
+  collected?: string[]
 }
 
 let lastHovered: HTMLElement | null = null
@@ -149,7 +150,7 @@ function getHoverable(): HTMLElement[] {
 }
 
 export function beginHints(mode: HintMode): HintSession | null {
-  const elements = mode === 'y' ? getCopyable() : mode === 'h' ? getHoverable() : getClickable()
+  const elements = (mode === 'y' || mode === 'ym') ? getCopyable() : mode === 'h' ? getHoverable() : getClickable()
   if (elements.length === 0) return null
 
   const labels = generateLabels(elements.length)
@@ -176,6 +177,16 @@ export function beginHints(mode: HintMode): HintSession | null {
 export function typeHint(session: HintSession, key: string): 'continue' | 'done' | 'cancel' {
   if (key === 'Escape') return 'cancel'
 
+  // Enter завершает multi-yank и копирует накопленный текст
+  if (key === 'Enter' && session.mode === 'ym') {
+    const collected = session.collected
+    if (collected && collected.length > 0) {
+      navigator.clipboard.writeText(collected.join('\n'))
+      showToast(`Copied ${collected.length} items`)
+    }
+    return 'done'
+  }
+
   if (key === 'Backspace') {
     session.typed = session.typed.slice(0, -1)
   } else if (/^[a-zA-Z]$/.test(key)) {
@@ -188,6 +199,17 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
 
   const match = session.entries.find(e => e.label === typed)
   if (match) {
+    if (session.mode === 'ym') {
+      const text = match.el.innerText?.trim() || ''
+      if (text) {
+        session.collected = session.collected ?? []
+        session.collected.push(text)
+        match.node.classList.add('selected')
+      }
+      session.typed = ''
+      for (const entry of session.entries) entry.node.classList.remove('dim')
+      return 'continue'
+    }
     activate(match, session.mode)
     return 'done'
   }

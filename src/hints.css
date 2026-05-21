@@ -30,6 +30,11 @@
   background: #88ff00;
 }
 
+.bs-vimium-hint.selected {
+  background: #00cc66;
+  color: #fff;
+}
+
 #bs-vimium-toast {
   position: fixed;
   top: 20px;

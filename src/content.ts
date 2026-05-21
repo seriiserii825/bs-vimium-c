@@ -25,6 +25,7 @@ type Action =
   | "closeTabsRight"
   | "closeTabsOthers"
   | "yankText"
+  | "yankMultiText"
   | "hoverElement";
 
 const actions: Record<Action, () => void> = {
@@ -36,6 +37,9 @@ const actions: Record<Action, () => void> = {
   },
   yankText: () => {
     session = beginHints("y");
+  },
+  yankMultiText: () => {
+    session = beginHints("ym");
   },
   hoverElement: () => {
     session = beginHints("h");
@@ -73,14 +77,17 @@ const altKeyMap = new Map<string, Action>(
   mappings.filter(({ hotkey }) => hotkey.startsWith("A-")).map(({ hotkey, action }) => [hotkey.slice(2), action as Action]),
 );
 
-// Keys that are the first character of a multi-char hotkey
-const prefixKeys = new Set<string>([...keyMap.keys()].filter((h) => h.length > 1).map((h) => h[0]));
+// All proper prefixes of multi-char hotkeys (e.g. "y", "ym", "g", ">", "<", "d")
+const prefixStrings = new Set<string>();
+for (const hotkey of keyMap.keys()) {
+  for (let i = 1; i < hotkey.length; i++) prefixStrings.add(hotkey.slice(0, i));
+}
 
-let pendingPrefix: string | null = null;
+let pendingPrefix = "";
 let prefixTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function clearPending(): void {
-  pendingPrefix = null;
+  pendingPrefix = "";
   if (prefixTimeout !== null) {
     clearTimeout(prefixTimeout);
     prefixTimeout = null;
@@ -133,18 +140,24 @@ document.addEventListener(
     if (isEditing()) return;
     if (e.repeat) return; // ignore OS key-repeat, we handle held keys ourselves
 
-    if (pendingPrefix !== null) {
+    if (pendingPrefix) {
       const combo = pendingPrefix + e.key;
-      clearPending();
-      const action = keyMap.get(combo);
-      if (action) {
+      if (keyMap.has(combo)) {
+        clearPending();
         e.preventDefault();
-        actions[action]();
+        actions[keyMap.get(combo)!]();
+      } else if (prefixStrings.has(combo)) {
+        e.preventDefault();
+        pendingPrefix = combo;
+        if (prefixTimeout !== null) clearTimeout(prefixTimeout);
+        prefixTimeout = setTimeout(clearPending, 1000);
+      } else {
+        clearPending();
       }
       return;
     }
 
-    if (prefixKeys.has(e.key)) {
+    if (prefixStrings.has(e.key)) {
       e.preventDefault();
       pendingPrefix = e.key;
       prefixTimeout = setTimeout(clearPending, 1000);
