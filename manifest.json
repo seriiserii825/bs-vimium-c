@@ -2,6 +2,8 @@
   "manifest_version": 3,
   "name": "bs-vimium-c",
   "version": "0.1.0",
+  "author": "Burduja Sergiu Blueline",
+  "homepage_url": "https://github.com/seriiserii825/bs-vimium-c",
   "description": "Keyboard-driven browser navigation",
   "icons": {
     "16": "icon16.png",
