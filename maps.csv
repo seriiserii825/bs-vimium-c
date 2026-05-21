@@ -18,6 +18,8 @@ yt,duplicateTab,Duplicate current tab
 nt,newTab,Open new tab
 x,closeTab,Close current tab
 X,restoreTab,Restore last closed tab
+H,historyBack,Go back in history
+L,historyForward,Go forward in history
 r,reloadTab,Reload current tab
 R,reloadTabHard,Reload tab bypassing cache
 dr,closeTabsRight,Close tabs to the right

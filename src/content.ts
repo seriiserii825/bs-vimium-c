@@ -17,6 +17,8 @@ type Action =
   | "goExtensions"
   | "goExtensionShortcuts"
   | "goDownloads"
+  | "historyBack"
+  | "historyForward"
   | "prevTab"
   | "nextTab"
   | "moveTabRight"
@@ -67,6 +69,8 @@ const actions: Record<Action, () => void> = {
   scrollUp: () => {
     startScroll(-1);
   },
+  historyBack:    () => { history.back() },
+  historyForward: () => { history.forward() },
   scrollToTop: scrollToTop,
   scrollToBottom: scrollToBottom,
   goUpUrl: () => {
