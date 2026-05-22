@@ -1,3 +1,5 @@
+import { writeText } from './clipboard'
+
 let panel: HTMLElement | null = null
 
 export function showImageInfo(img: HTMLImageElement): void {
@@ -39,8 +41,8 @@ export function showImageInfo(img: HTMLImageElement): void {
   const footer = document.createElement('div')
   footer.id = 'bs-imginfo-footer'
 
-  footer.appendChild(makeBtn('Copy path', () => navigator.clipboard.writeText(src)))
-  footer.appendChild(makeBtn('Copy name', () => navigator.clipboard.writeText(filename)))
+  footer.appendChild(makeBtn('Copy path', () => writeText(src)))
+  footer.appendChild(makeBtn('Copy name', () => writeText(filename)))
 
   panel.appendChild(footer)
 

@@ -1,7 +1,8 @@
 import { showToast } from './toast'
 import { showImageInfo } from './imageinfo'
+import { writeText } from './clipboard'
 
-// Home-row first for comfortable typing
+// Home-row first for comfortable typography
 const CHARS = 'sadfjklewcmpgh'
 
 function getCopyable(): HTMLElement[] {
@@ -31,7 +32,9 @@ function getClickable(): HTMLElement[] {
   const result: HTMLElement[] = []
   for (const el of Array.from(document.querySelectorAll<HTMLElement>('*'))) {
     if (!isVisible(el)) continue
-    if (fromSelector.has(el) || window.getComputedStyle(el).cursor === 'pointer') {
+    if (fromSelector.has(el)) {
+      result.push(el)
+    } else if (window.getComputedStyle(el).cursor === 'pointer' && !el.closest('svg')) {
       result.push(el)
     }
   }
@@ -187,7 +190,7 @@ export function beginHints(mode: HintMode): HintSession | null {
     : mode === 'yi' ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
-    : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(isVisible)
+    : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(el => isVisible(el) && !el.parentElement?.closest('svg'))
     : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : (mode === 'ctc' || mode === 'ctmc') ? getTableColumns()
@@ -222,7 +225,7 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
   if (key === 'Enter' && (session.mode === 'ym' || session.mode === 'ctmc')) {
     const collected = session.collected
     if (collected && collected.length > 0) {
-      navigator.clipboard.writeText(collected.join('\n'))
+      writeText(collected.join('\n'))
       showToast(`Copied ${collected.length} items`)
     }
     return 'done'
@@ -304,6 +307,7 @@ async function copyImageToClipboard(src: string): Promise<void> {
     const blob = await new Promise<Blob>((resolve, reject) =>
       canvas.toBlob(b => b ? resolve(b) : reject(), 'image/png')
     )
+    if (!navigator.clipboard?.write) { showToast('Copy failed (HTTPS required)'); return }
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
     showToast('Image copied')
   } catch {
@@ -314,7 +318,7 @@ async function copyImageToClipboard(src: string): Promise<void> {
 function activate(entry: HintEntry, mode: HintMode): void {
   if (mode === 'ctc') {
     const text = getColumnText(entry.el as HTMLTableCellElement)
-    navigator.clipboard.writeText(text)
+    writeText(text)
     showToast(`Copied ${text.split('\n').length} cells`)
   } else if (mode === 'ii') {
     showImageInfo(entry.el as HTMLImageElement)
@@ -330,20 +334,20 @@ function activate(entry: HintEntry, mode: HintMode): void {
   } else if (mode === 'cs') {
     const svg = entry.el as unknown as SVGElement
     const code = new XMLSerializer().serializeToString(svg)
-    navigator.clipboard.writeText(code)
+    writeText(code)
     showToast('SVG copied')
   } else if (mode === 'yl') {
     const url = (entry.el as HTMLAnchorElement).href
-    navigator.clipboard.writeText(url)
+    writeText(url)
     showToast(url)
   } else if (mode === 'yi') {
     const el = entry.el as HTMLInputElement | HTMLTextAreaElement
     const text = el.value.trim() || (el as HTMLInputElement).placeholder?.trim() || ''
-    navigator.clipboard.writeText(text)
+    writeText(text)
     showToast(text)
   } else if (mode === 'y') {
     const text = entry.el.innerText?.trim() || ''
-    navigator.clipboard.writeText(text)
+    writeText(text)
     showToast(text)
   } else if (mode === 'F' && entry.el instanceof HTMLAnchorElement && entry.el.href) {
     window.open(entry.el.href, '_blank')
