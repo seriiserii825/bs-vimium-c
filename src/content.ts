@@ -67,7 +67,8 @@ type Action =
   | "showSeoInfo"
   | "showSeoHeadings"
   | "inputEdit"
-  | "inputClearEdit";
+  | "inputClearEdit"
+  | "inputEditStart";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -158,6 +159,7 @@ const actions: Record<Action, () => void> = {
   showSeoInfo: () => { showSeoInfo(); },
   showSeoHeadings: () => { showSeoHeadings(); },
   inputEdit: () => { session = beginHints("ie"); },
+  inputEditStart: () => { session = beginHints("is"); },
   inputClearEdit: () => { session = beginHints("ic"); },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {

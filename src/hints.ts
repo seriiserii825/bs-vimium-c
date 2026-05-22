@@ -64,7 +64,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is'
 
 export interface HintEntry {
   el: HTMLElement
@@ -187,7 +187,7 @@ function getHoverable(): HTMLElement[] {
 export function beginHints(mode: HintMode): HintSession | null {
   const elements = (mode === 'y' || mode === 'ym') ? getCopyable()
     : mode === 'yl' ? Array.from(document.querySelectorAll<HTMLElement>('a[href]')).filter(isVisible)
-    : (mode === 'yi' || mode === 'ie' || mode === 'ic') ? Array.from(document.querySelectorAll<HTMLElement>(
+    : (mode === 'yi' || mode === 'ie' || mode === 'ic' || mode === 'is') ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
     : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(el => isVisible(el) && !el.parentElement?.closest('svg'))
@@ -346,7 +346,13 @@ function activate(entry: HintEntry, mode: HintMode): void {
     writeText(text)
     showToast(text)
   } else if (mode === 'ie') {
-    entry.el.focus()
+    const el = entry.el as HTMLInputElement | HTMLTextAreaElement
+    el.focus()
+    try { el.setSelectionRange(el.value.length, el.value.length) } catch { /* unsupported input type */ }
+  } else if (mode === 'is') {
+    const el = entry.el as HTMLInputElement | HTMLTextAreaElement
+    el.focus()
+    try { el.setSelectionRange(0, 0) } catch { /* unsupported input type */ }
   } else if (mode === 'ic') {
     const el = entry.el as HTMLInputElement | HTMLTextAreaElement
     el.value = ''

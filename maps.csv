@@ -44,6 +44,7 @@ gd,goDownloads,Go to downloads
 W,moveTabToWindow,Move tab to another window
 sh,showSeoInfo,Show SEO meta info
 st,showSeoHeadings,Show heading structure (h1/h2/h3)
-ie,inputEdit,Focus input or textarea
+ii,inputEditStart,Focus input and place cursor at start
+ie,inputEdit,Focus input and place cursor at end
 ic,inputClearEdit,Clear and focus input or textarea
 ?,showHelp,Show keyboard shortcuts
