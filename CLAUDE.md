@@ -33,6 +33,8 @@ Adding a new action requires: a new row in `maps.csv`, a new entry in the `Actio
 
 **Hints system** (`hints.ts`) — activated by various keys. Overlays labeled `<div>` nodes at viewport coordinates. Labels use home-row chars (`sadfjklewcmpgh`), single-char for ≤14 elements, two-char pairs beyond that. `typeHint` filters visible hints on each keypress; `endHints` removes the container.
 
+Hint placement: each hint is placed at the element's own `getBoundingClientRect()` top-left. `getClickable()` excludes elements inside `<svg>` from the cursor-pointer check (they only inherit cursor and are not independently clickable), preventing duplicate stacked hints on icon buttons.
+
 Hint modes:
 - `f` — follow link (click) in current tab
 - `F` — follow link in new tab
@@ -43,8 +45,9 @@ Hint modes:
 - `om` — multi-select open: open each selected link in background tab (no focus switch)
 - `h` — hover element: activates CSS `:hover` via stylesheet rewriting + dispatches JS mouse events up ancestor chain
 - `di` — download image via `chrome.downloads`
-- `ci` — copy image to clipboard as PNG blob (canvas approach for cross-origin)
+- `ci` — copy image to clipboard as PNG blob (canvas approach for cross-origin; requires HTTPS)
 - `oi` — open image src in new tab
+- `cs` — copy SVG code to clipboard; only top-level `<svg>` elements get hints (nested SVGs excluded)
 
 **Hover system** (`hints.ts`) — `A-h` activates hover mode. Two-pronged approach:
 1. CSS injection: reads all page stylesheets, rewrites `:hover` → `[data-bs-hover]`, injects as `<style>` tag, adds `data-bs-hover` attribute to target and ancestors. Handles CSS `:hover` effects (e.g. WordPress row-actions).
@@ -73,5 +76,6 @@ Escape calls `unhoverLast()` which reverses both.
 | `help.css` | Help popup styles |
 | `prompt.ts` | Reusable input prompt popup |
 | `prompt.css` | Prompt styles |
+| `clipboard.ts` | `writeText()` helper — uses `navigator.clipboard` when available, falls back to `execCommand('copy')` for HTTP pages |
 | `maps.csv` | All keybindings (single source of truth) |
 | `maps.d.ts` | TypeScript type for CSV import |
