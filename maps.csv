@@ -20,7 +20,7 @@ ymc,copyTableMultiColumn,Copy multiple table columns
 oI,openImage,Open image in new tab
 oi,openIncognito,Open current tab in incognito window
 di,downloadImage,Download image
-ii,imageInfo,Show image info popup
+Ii,imageInfo,Show image info popup
 eu,editUrlCurrentTab,Edit URL and open in current tab
 eU,editUrlNewTab,Edit URL and open in new tab
 gu,goUpUrl,Go one level up in URL
@@ -44,4 +44,6 @@ gd,goDownloads,Go to downloads
 W,moveTabToWindow,Move tab to another window
 sh,showSeoInfo,Show SEO meta info
 st,showSeoHeadings,Show heading structure (h1/h2/h3)
+ie,inputEdit,Focus input or textarea
+ic,inputClearEdit,Clear and focus input or textarea
 ?,showHelp,Show keyboard shortcuts

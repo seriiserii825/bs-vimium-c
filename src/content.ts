@@ -65,7 +65,9 @@ type Action =
   | "copyTableColumn"
   | "copyTableMultiColumn"
   | "showSeoInfo"
-  | "showSeoHeadings";
+  | "showSeoHeadings"
+  | "inputEdit"
+  | "inputClearEdit";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -155,6 +157,8 @@ const actions: Record<Action, () => void> = {
   copyTableMultiColumn: () => { session = beginHints("ctmc"); },
   showSeoInfo: () => { showSeoInfo(); },
   showSeoHeadings: () => { showSeoHeadings(); },
+  inputEdit: () => { session = beginHints("ie"); },
+  inputClearEdit: () => { session = beginHints("ic"); },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);

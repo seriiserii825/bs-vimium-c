@@ -64,7 +64,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic'
 
 export interface HintEntry {
   el: HTMLElement
@@ -187,7 +187,7 @@ function getHoverable(): HTMLElement[] {
 export function beginHints(mode: HintMode): HintSession | null {
   const elements = (mode === 'y' || mode === 'ym') ? getCopyable()
     : mode === 'yl' ? Array.from(document.querySelectorAll<HTMLElement>('a[href]')).filter(isVisible)
-    : mode === 'yi' ? Array.from(document.querySelectorAll<HTMLElement>(
+    : (mode === 'yi' || mode === 'ie' || mode === 'ic') ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
     : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(el => isVisible(el) && !el.parentElement?.closest('svg'))
@@ -345,6 +345,13 @@ function activate(entry: HintEntry, mode: HintMode): void {
     const text = el.value.trim() || (el as HTMLInputElement).placeholder?.trim() || ''
     writeText(text)
     showToast(text)
+  } else if (mode === 'ie') {
+    entry.el.focus()
+  } else if (mode === 'ic') {
+    const el = entry.el as HTMLInputElement | HTMLTextAreaElement
+    el.value = ''
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+    el.focus()
   } else if (mode === 'y') {
     const text = entry.el.innerText?.trim() || ''
     writeText(text)
