@@ -41,8 +41,11 @@ export function showImageInfo(img: HTMLImageElement): void {
   const footer = document.createElement('div')
   footer.id = 'bs-imginfo-footer'
 
+  const basename = filename.includes('.') ? filename.slice(0, filename.lastIndexOf('.')) : filename
+
   footer.appendChild(makeBtn('Copy path', () => writeText(src)))
   footer.appendChild(makeBtn('Copy name', () => writeText(filename)))
+  footer.appendChild(makeBtn('Copy basename', () => writeText(basename)))
 
   panel.appendChild(footer)
 
