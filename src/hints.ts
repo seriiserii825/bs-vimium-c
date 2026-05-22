@@ -15,7 +15,12 @@ function getCopyable(): HTMLElement[] {
   })
 }
 
-function getClickable(): HTMLElement[] {
+interface Clickable {
+  el: HTMLElement
+  clickTarget?: HTMLElement
+}
+
+function getClickable(): Clickable[] {
   const selector = [
     'a[href]',
     'button:not([disabled])',
@@ -29,13 +34,31 @@ function getClickable(): HTMLElement[] {
   ].join(', ')
 
   const fromSelector = new Set(Array.from(document.querySelectorAll<HTMLElement>(selector)))
-  const result: HTMLElement[] = []
+  const added = new Set<HTMLElement>()
+  const result: Clickable[] = []
+
+  const add = (el: HTMLElement, clickTarget?: HTMLElement) => {
+    if (!added.has(el)) { added.add(el); result.push({ el, clickTarget }) }
+  }
+
+  // For hidden interactive elements (e.g. visually-replaced checkboxes/radios),
+  // place hint on closest visible ancestor but keep original as clickTarget.
+  for (const el of fromSelector) {
+    if (!isVisible(el)) {
+      let p = el.parentElement
+      while (p) {
+        if (isVisible(p)) { add(p, el); break }
+        p = p.parentElement
+      }
+    }
+  }
+
   for (const el of Array.from(document.querySelectorAll<HTMLElement>('*'))) {
     if (!isVisible(el)) continue
     if (fromSelector.has(el)) {
-      result.push(el)
+      add(el)
     } else if (window.getComputedStyle(el).cursor === 'pointer' && !el.closest('svg')) {
-      result.push(el)
+      add(el)
     }
   }
   return result
@@ -68,6 +91,7 @@ export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' 
 
 export interface HintEntry {
   el: HTMLElement
+  clickTarget?: HTMLElement
   label: string
   node: HTMLElement
 }
@@ -185,7 +209,8 @@ function getHoverable(): HTMLElement[] {
 }
 
 export function beginHints(mode: HintMode): HintSession | null {
-  const elements = (mode === 'y' || mode === 'ym') ? getCopyable()
+  const rawElements: HTMLElement[] | Clickable[] =
+    (mode === 'y' || mode === 'ym') ? getCopyable()
     : mode === 'yl' ? Array.from(document.querySelectorAll<HTMLElement>('a[href]')).filter(isVisible)
     : (mode === 'yi' || mode === 'ie' || mode === 'ic' || mode === 'is') ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
@@ -195,15 +220,19 @@ export function beginHints(mode: HintMode): HintSession | null {
     : mode === 'h' ? getHoverable()
     : (mode === 'ctc' || mode === 'ctmc') ? getTableColumns()
     : getClickable()
-  if (elements.length === 0) return null
+  if (rawElements.length === 0) return null
 
-  const labels = generateLabels(elements.length)
+  const clickables: Clickable[] = (rawElements as Array<HTMLElement | Clickable>).map(
+    item => (item instanceof HTMLElement ? { el: item } : item)
+  )
+
+  const labels = generateLabels(clickables.length)
 
   const container = document.createElement('div')
   container.id = 'bs-vimium-hints'
   document.documentElement.appendChild(container)
 
-  const entries: HintEntry[] = elements.map((el, i) => {
+  const entries: HintEntry[] = clickables.map(({ el, clickTarget }, i) => {
     const r = el.getBoundingClientRect()
     const node = document.createElement('div')
     node.className = 'bs-vimium-hint'
@@ -212,7 +241,7 @@ export function beginHints(mode: HintMode): HintSession | null {
     node.style.left = `${Math.round(r.left)}px`
     node.style.top = `${Math.round(r.top)}px`
     container.appendChild(node)
-    return { el, label: labels[i], node }
+    return { el, clickTarget, label: labels[i], node }
   })
 
   return { mode, entries, typed: '', container }
@@ -380,8 +409,9 @@ function activate(entry: HintEntry, mode: HintMode): void {
     dispatchMouse(entry.el, 'mouseover', cx, cy)
     dispatchMouse(entry.el, 'mousemove', cx, cy)
   } else {
-    entry.el.focus()
-    entry.el.click()
+    const clickEl = entry.clickTarget ?? entry.el
+    clickEl.focus()
+    clickEl.click()
   }
 }
 
