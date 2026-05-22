@@ -2,8 +2,8 @@ import { showToast } from './toast'
 import { showImageInfo } from './imageinfo'
 import { writeText } from './clipboard'
 
-// Home-row first for comfortable typography
-const CHARS = 'sadfjklewcmpgh'
+// Home-row first, then nearby keys for comfortable typing
+const CHARS = 'sadfjklewcmpghnrtuoibv'
 
 function getCopyable(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {
