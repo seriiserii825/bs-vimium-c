@@ -56,6 +56,7 @@ type Action =
   | "editUrlNewTab"
   | "downloadImage"
   | "copyImage"
+  | "copySvg"
   | "openImage"
   | "openIncognito"
   | "moveTabToWindow"
@@ -96,6 +97,7 @@ const actions: Record<Action, () => void> = {
   },
   downloadImage: () => { session = beginHints("di"); },
   copyImage:     () => { session = beginHints("ci"); },
+  copySvg:       () => { session = beginHints("cs"); },
   openImage:     () => { session = beginHints("oI"); },
   openIncognito: () => { chrome.runtime.sendMessage({ type: "openIncognito" }) },
   editUrlCurrentTab: () => {

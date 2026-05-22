@@ -61,7 +61,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'oI' | 'ii' | 'ctc' | 'ctmc'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc'
 
 export interface HintEntry {
   el: HTMLElement
@@ -187,6 +187,7 @@ export function beginHints(mode: HintMode): HintSession | null {
     : mode === 'yi' ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
+    : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(isVisible)
     : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : (mode === 'ctc' || mode === 'ctmc') ? getTableColumns()
@@ -326,6 +327,11 @@ function activate(entry: HintEntry, mode: HintMode): void {
   } else if (mode === 'ci') {
     const src = (entry.el as HTMLImageElement).src
     if (src) copyImageToClipboard(src)
+  } else if (mode === 'cs') {
+    const svg = entry.el as unknown as SVGElement
+    const code = new XMLSerializer().serializeToString(svg)
+    navigator.clipboard.writeText(code)
+    showToast('SVG copied')
   } else if (mode === 'yl') {
     const url = (entry.el as HTMLAnchorElement).href
     navigator.clipboard.writeText(url)

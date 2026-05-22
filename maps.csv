@@ -14,6 +14,7 @@ yl,yankLinkUrl,Copy link URL
 yi,yankInputText,Copy text from input
 ymv,yankMultiText,Copy multiple elements
 ci,copyImage,Copy image to clipboard
+cs,copySvg,Copy SVG code to clipboard
 yc,copyTableColumn,Copy table column
 ymc,copyTableMultiColumn,Copy multiple table columns
 oI,openImage,Open image in new tab
