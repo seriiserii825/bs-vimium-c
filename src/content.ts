@@ -209,6 +209,27 @@ function isEditing(): boolean {
   );
 }
 
+const hookedDocs = new WeakSet<Document>();
+
+document.addEventListener('focusin', (e) => {
+  const el = e.target as HTMLElement;
+  if (el.tagName !== 'IFRAME') return;
+  const iframe = el as HTMLIFrameElement;
+  try {
+    const doc = iframe.contentDocument;
+    if (!doc || hookedDocs.has(doc)) return;
+    hookedDocs.add(doc);
+    doc.addEventListener('keydown', (ke) => {
+      if (ke.key !== 'Escape') return;
+      ke.preventDefault();
+      ke.stopImmediatePropagation();
+      (doc.activeElement as HTMLElement)?.blur();
+      iframe.blur();
+      window.focus();
+    }, { capture: true });
+  } catch {}
+}, true);
+
 document.addEventListener(
   "keydown",
   (e: KeyboardEvent) => {
@@ -250,6 +271,10 @@ document.addEventListener(
       if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
+      if (window.frameElement) {
+        (window.frameElement as HTMLElement).blur();
+        window.parent.focus();
+      }
       unhoverLast();
       return;
     }
