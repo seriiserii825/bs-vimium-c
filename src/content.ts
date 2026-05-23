@@ -50,6 +50,7 @@ type Action =
   | "yankInputText"
   | "yankMultiText"
   | "openMultiLinks"
+  | "followMultiClick"
   | "hoverElement"
   | "showHelp"
   | "editUrlCurrentTab"
@@ -91,6 +92,9 @@ const actions: Record<Action, () => void> = {
   },
   openMultiLinks: () => {
     session = beginHints("om");
+  },
+  followMultiClick: () => {
+    session = beginHints("ymf");
   },
   hoverElement: () => {
     session = beginHints("h");

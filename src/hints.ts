@@ -87,7 +87,7 @@ function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is'
 
 export interface HintEntry {
   el: HTMLElement
@@ -102,6 +102,7 @@ export interface HintSession {
   typed: string
   container: HTMLElement
   collected?: string[]
+  collectedEntries?: HintEntry[]
 }
 
 let lastHovered: HTMLElement | null = null
@@ -260,6 +261,20 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
     return 'done'
   }
 
+  // Enter завершает multi-follow и кликает все накопленные элементы
+  if (key === 'Enter' && session.mode === 'ymf') {
+    const entries = session.collectedEntries
+    if (entries && entries.length > 0) {
+      for (const entry of entries) {
+        const clickEl = entry.clickTarget ?? entry.el
+        clickEl.focus()
+        clickEl.click()
+      }
+      showToast(`Clicked ${entries.length} elements`)
+    }
+    return 'done'
+  }
+
   if (key === 'Backspace') {
     session.typed = session.typed.slice(0, -1)
   } else if (/^[a-zA-Z]$/.test(key)) {
@@ -301,6 +316,14 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
       } else {
         el.click()
       }
+      match.node.classList.add('selected')
+      session.typed = ''
+      for (const entry of session.entries) entry.node.classList.remove('dim')
+      return 'continue'
+    }
+    if (session.mode === 'ymf') {
+      session.collectedEntries = session.collectedEntries ?? []
+      session.collectedEntries.push(match)
       match.node.classList.add('selected')
       session.typed = ''
       for (const entry of session.entries) entry.node.classList.remove('dim')

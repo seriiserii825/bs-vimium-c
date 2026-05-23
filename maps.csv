@@ -7,6 +7,7 @@ H,historyBack,Go back in history
 L,historyForward,Go forward in history
 f,followLink,Follow link in same tab
 F,followLinkNewTab,Follow link in new tab
+mf,followMultiClick,Click multiple elements then Enter
 oml,openMultiLinks,Open multiple links in new tabs
 A-h,hoverElement,Hover over element
 yv,yankText,Copy text of element
