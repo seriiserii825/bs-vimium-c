@@ -3,7 +3,7 @@ import { showImageInfo } from './imageinfo'
 import { writeText } from './clipboard'
 
 // Home-row first, then nearby keys for comfortable typing
-const CHARS = 'sadfjklewcmpghnrtuoibv'
+const CHARS = 'sadfjklewcpghnrtuoibv'
 
 function getCopyable(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {

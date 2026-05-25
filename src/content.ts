@@ -24,6 +24,8 @@ type Action =
   | "followLinkNewTab"
   | "scrollDown"
   | "scrollUp"
+  | "slowScrollDown"
+  | "slowScrollUp"
   | "scrollToTop"
   | "scrollToBottom"
   | "goUpUrl"
@@ -123,6 +125,12 @@ const actions: Record<Action, () => void> = {
   scrollUp: () => {
     startScroll(-1);
   },
+  slowScrollDown: () => {
+    startScroll(1, true);
+  },
+  slowScrollUp: () => {
+    startScroll(-1, true);
+  },
   historyBack:    () => { history.back() },
   historyForward: () => { history.forward() },
   scrollToTop: scrollToTop,
@@ -173,7 +181,7 @@ const actions: Record<Action, () => void> = {
 };
 
 // Actions that scroll continuously — need keyup to stop
-const continuousActions = new Set<Action>(["scrollDown", "scrollUp"]);
+const continuousActions = new Set<Action>(["scrollDown", "scrollUp", "slowScrollDown", "slowScrollUp"]);
 
 const keyMap = new Map<string, Action>(
   mappings.filter(({ hotkey }) => !hotkey.startsWith("A-")).map(({ hotkey, action }) => [hotkey, action as Action]),
@@ -258,10 +266,16 @@ document.addEventListener(
     if (session) {
       e.preventDefault();
       e.stopPropagation();
+      const mode = session.mode;
       const result = typeHint(session, e.key);
       if (result !== "continue") {
         endHints(session);
         session = null;
+        // For f/F: return focus to page after the hint ends (done or Escape-cancel)
+        if (mode === 'f' || mode === 'F') {
+          (document.activeElement as HTMLElement)?.blur();
+          window.focus();
+        }
       }
       return;
     }

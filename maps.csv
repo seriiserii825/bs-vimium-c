@@ -1,6 +1,8 @@
 hotkey,action,description
 j,scrollDown,Scroll down
 k,scrollUp,Scroll up
+J,slowScrollDown,Scroll down slowly
+K,slowScrollUp,Scroll up slowly
 gg,scrollToTop,Scroll to top of page
 G,scrollToBottom,Scroll to bottom of page
 H,historyBack,Go back in history
@@ -26,8 +28,8 @@ eu,editUrlCurrentTab,Edit URL and open in current tab
 eU,editUrlNewTab,Edit URL and open in new tab
 gu,goUpUrl,Go one level up in URL
 gU,goRootUrl,Go to root URL
-J,prevTab,Switch to previous tab
-K,nextTab,Switch to next tab
+N,prevTab,Switch to previous tab
+M,nextTab,Switch to next tab
 >>,moveTabRight,Move tab right
 <<,moveTabLeft,Move tab left
 yt,duplicateTab,Duplicate current tab

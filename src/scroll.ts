@@ -1,4 +1,5 @@
 const VELOCITY = 1500; // px/s while key held
+const SLOW_VELOCITY = 300; // px/s for slow scroll (J/K)
 const DECEL = 15000; // px/s² linear deceleration after keyup (~100ms coast)
 
 let vel = 0; // current velocity, signed (px/s)
@@ -6,8 +7,8 @@ let active = false; // is scroll key currently held
 let lastTime = 0;
 let rafId: number | null = null;
 
-export function startScroll(direction: 1 | -1): void {
-  vel = direction * VELOCITY;
+export function startScroll(direction: 1 | -1, slow = false): void {
+  vel = direction * (slow ? SLOW_VELOCITY : VELOCITY);
   active = true;
   if (rafId !== null) return; // already ticking
   lastTime = performance.now();
