@@ -18,7 +18,16 @@ export function showHelp(mappings: Mapping[]): void {
 
   const header = document.createElement('div')
   header.id = 'bs-vimium-help-header'
-  header.textContent = 'Keyboard Shortcuts'
+
+  const title = document.createElement('span')
+  title.textContent = 'Keyboard Shortcuts'
+  header.appendChild(title)
+
+  const search = document.createElement('input')
+  search.id = 'bs-vimium-help-search'
+  search.type = 'text'
+  search.placeholder = 'Search shortcuts...'
+  header.appendChild(search)
 
   const closeBtn = document.createElement('button')
   closeBtn.id = 'bs-vimium-help-close'
@@ -28,6 +37,9 @@ export function showHelp(mappings: Mapping[]): void {
 
   const body = document.createElement('div')
   body.id = 'bs-vimium-help-body'
+
+  type Row = { el: HTMLElement; hotkey: string; desc: string }
+  const rows: Row[] = []
 
   for (const { hotkey, description } of mappings) {
     const row = document.createElement('div')
@@ -46,7 +58,16 @@ export function showHelp(mappings: Mapping[]): void {
     row.appendChild(keyCell)
     row.appendChild(descCell)
     body.appendChild(row)
+    rows.push({ el: row, hotkey: hotkey.toLowerCase(), desc: description.toLowerCase() })
   }
+
+  search.addEventListener('input', () => {
+    const q = search.value.toLowerCase().trim()
+    for (const r of rows) {
+      r.el.style.display = (!q || r.hotkey.includes(q) || r.desc.includes(q)) ? '' : 'none'
+    }
+    body.style.columns = q ? '1' : ''
+  })
 
   panel.appendChild(header)
   panel.appendChild(body)
@@ -57,6 +78,7 @@ export function showHelp(mappings: Mapping[]): void {
   })
 
   document.documentElement.appendChild(backdrop)
+  requestAnimationFrame(() => search.focus())
 }
 
 export function hideHelp(): void {

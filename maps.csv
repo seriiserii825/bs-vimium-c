@@ -50,4 +50,8 @@ st,showSeoHeadings,Show heading structure (h1/h2/h3)
 ii,inputEditStart,Focus input and place cursor at start
 ie,inputEdit,Focus input and place cursor at end
 ic,inputClearEdit,Clear and focus input or textarea
+zw,zoomFitWindow,Reset zoom (fit to window)
+zf,zoomFull,Zoom to 100%
+zi,zoomIn,Zoom in
+zo,zoomOut,Zoom out
 ?,showHelp,Show keyboard shortcuts

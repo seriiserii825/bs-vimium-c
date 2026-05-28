@@ -71,7 +71,11 @@ type Action =
   | "showSeoHeadings"
   | "inputEdit"
   | "inputClearEdit"
-  | "inputEditStart";
+  | "inputEditStart"
+  | "zoomFitWindow"
+  | "zoomFull"
+  | "zoomIn"
+  | "zoomOut";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -173,6 +177,14 @@ const actions: Record<Action, () => void> = {
   inputEdit: () => { session = beginHints("ie"); },
   inputEditStart: () => { session = beginHints("is"); },
   inputClearEdit: () => { session = beginHints("ic"); },
+  zoomFitWindow: () => {
+    const contentWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth ?? 0);
+    const ratio = contentWidth > 0 ? window.innerWidth / contentWidth : 1;
+    chrome.runtime.sendMessage({ type: "zoomFitWindow", ratio });
+  },
+  zoomFull:      () => { chrome.runtime.sendMessage({ type: "zoomFull" }) },
+  zoomIn:        () => { chrome.runtime.sendMessage({ type: "zoomIn" }) },
+  zoomOut:       () => { chrome.runtime.sendMessage({ type: "zoomOut" }) },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);

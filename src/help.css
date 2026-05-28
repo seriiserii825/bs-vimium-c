@@ -34,6 +34,26 @@
   flex-shrink: 0;
 }
 
+#bs-vimium-help-search {
+  background: #313244;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  color: #cdd6f4;
+  font-family: sans-serif;
+  font-size: 13px;
+  outline: none;
+  padding: 5px 12px;
+  width: 200px;
+}
+
+#bs-vimium-help-search::placeholder {
+  color: #6c7086;
+}
+
+#bs-vimium-help-search:focus {
+  border-color: #cba6f7;
+}
+
 #bs-vimium-help-close {
   background: none;
   border: none;

@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number }, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number; ratio?: number }, _sender, sendResponse) => {
   const type = msg.type;
 
   if (type === "getCookies" && msg.url) {
@@ -52,6 +52,47 @@ chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; current
       await chrome.tabs.move(msg.currentTabId!, { windowId: msg.targetWindowId!, index: -1 });
       await chrome.tabs.update(msg.currentTabId!, { active: true });
       await chrome.windows.update(msg.targetWindowId!, { focused: true });
+    })();
+    return;
+  }
+
+  if (type === "zoomFitWindow") {
+    (async () => {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab.id) return;
+      if (msg.ratio !== undefined) {
+        const current = await chrome.tabs.getZoom(tab.id);
+        chrome.tabs.setZoom(tab.id, current * msg.ratio);
+      } else {
+        chrome.tabs.setZoom(tab.id, 0);
+      }
+    })();
+    return;
+  }
+
+  if (type === "zoomFull") {
+    (async () => {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab.id) chrome.tabs.setZoom(tab.id, 1.0);
+    })();
+    return;
+  }
+
+  if (type === "zoomIn" || type === "zoomOut") {
+    const ZOOM_STEPS = [0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0, 5.0];
+    (async () => {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab.id) return;
+      const current = await chrome.tabs.getZoom(tab.id);
+      const pct = Math.round(current * 100);
+      const idx = ZOOM_STEPS.findIndex(z => Math.round(z * 100) === pct);
+      let next: number;
+      if (type === "zoomIn") {
+        next = idx === -1 ? 1.1 : ZOOM_STEPS[Math.min(idx + 1, ZOOM_STEPS.length - 1)];
+      } else {
+        next = idx === -1 ? 0.9 : ZOOM_STEPS[Math.max(idx - 1, 0)];
+      }
+      chrome.tabs.setZoom(tab.id, next);
     })();
     return;
   }
