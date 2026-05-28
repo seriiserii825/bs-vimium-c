@@ -205,6 +205,7 @@ function getColumnText(cell: HTMLTableCellElement): string {
 function getHoverable(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {
     if (!isVisible(el)) return false
+    if (el.closest('svg')) return false
     return window.getComputedStyle(el).cursor === 'pointer'
   })
 }
