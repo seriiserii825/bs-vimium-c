@@ -6,7 +6,9 @@ import "./cookieconfirm.css";
 import "./imageinfo.css";
 import "./seoinfo.css";
 import "./seoheadings.css";
+import "./tabswitcher.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
+import { beginTabSwitch, typeTabSwitch, endTabSwitch, TabSwitchSession } from "./tabswitcher";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
 import { showPrompt, hidePrompt, isPromptVisible } from "./prompt";
 import { showWhichKey, hideWhichKey, isWhichKeyVisible } from "./whichkey";
@@ -18,6 +20,7 @@ import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
 let session: HintSession | null = null;
+let tabSession: TabSwitchSession | null = null;
 
 type Action =
   | "followLink"
@@ -75,7 +78,8 @@ type Action =
   | "zoomFitWindow"
   | "zoomFull"
   | "zoomIn"
-  | "zoomOut";
+  | "zoomOut"
+  | "goToTab";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -185,6 +189,12 @@ const actions: Record<Action, () => void> = {
   zoomFull:      () => { chrome.runtime.sendMessage({ type: "zoomFull" }) },
   zoomIn:        () => { chrome.runtime.sendMessage({ type: "zoomIn" }) },
   zoomOut:       () => { chrome.runtime.sendMessage({ type: "zoomOut" }) },
+  goToTab: () => {
+    chrome.runtime.sendMessage({ type: "getTabs" }, (res) => {
+      if (!res?.tabs?.length) return;
+      tabSession = beginTabSwitch(res.tabs);
+    });
+  },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
@@ -272,6 +282,20 @@ document.addEventListener(
 
     if (isPromptVisible()) {
       if (e.key === "Escape") { hidePrompt(); e.preventDefault(); }
+      return;
+    }
+
+    if (tabSession) {
+      e.preventDefault();
+      e.stopPropagation();
+      const { result, tabId } = typeTabSwitch(tabSession, e.key);
+      if (result !== "continue") {
+        endTabSwitch(tabSession);
+        tabSession = null;
+        if (result === "done" && tabId !== undefined) {
+          chrome.runtime.sendMessage({ type: "switchToTab", tabId });
+        }
+      }
       return;
     }
 

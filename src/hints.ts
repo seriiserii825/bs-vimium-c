@@ -73,7 +73,7 @@ function isVisible(el: HTMLElement): boolean {
   return s.display !== 'none' && s.visibility !== 'hidden' && parseFloat(s.opacity) > 0
 }
 
-function generateLabels(n: number): string[] {
+export function generateLabels(n: number): string[] {
   const labels: string[] = []
   if (n <= CHARS.length) {
     for (let i = 0; i < n; i++) labels.push(CHARS[i])

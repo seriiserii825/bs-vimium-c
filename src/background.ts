@@ -1,5 +1,18 @@
-chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number; ratio?: number }, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number; ratio?: number; tabId?: number }, _sender, sendResponse) => {
   const type = msg.type;
+
+  if (type === "getTabs") {
+    chrome.tabs.query({ currentWindow: true }, (tabs) => {
+      const sorted = tabs.filter(t => t.index !== undefined).sort((a, b) => a.index! - b.index!)
+      sendResponse({ tabs: sorted.map(t => ({ id: t.id!, title: t.title || '', url: t.url || '', favIconUrl: t.favIconUrl, active: t.active })) })
+    })
+    return true
+  }
+
+  if (type === "switchToTab" && msg.tabId !== undefined) {
+    chrome.tabs.update(msg.tabId, { active: true })
+    return
+  }
 
   if (type === "getCookies" && msg.url) {
     chrome.cookies.getAll({ url: msg.url }, (cookies) => {

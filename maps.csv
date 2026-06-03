@@ -28,6 +28,7 @@ eu,editUrlCurrentTab,Edit URL and open in current tab
 eU,editUrlNewTab,Edit URL and open in new tab
 gu,goUpUrl,Go one level up in URL
 gU,goRootUrl,Go to root URL
+gt,goToTab,Switch to tab in current window
 N,prevTab,Switch to previous tab
 M,nextTab,Switch to next tab
 >>,moveTabRight,Move tab right
