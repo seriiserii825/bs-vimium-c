@@ -87,7 +87,7 @@ export function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is' | 'c'
 
 export interface HintEntry {
   el: HTMLElement
@@ -210,6 +210,70 @@ function getHoverable(): HTMLElement[] {
   })
 }
 
+function getCheckboxesAndRadios(): Clickable[] {
+  const inputs = Array.from(document.querySelectorAll<HTMLElement>(
+    'input[type="checkbox"]:not([disabled]), input[type="radio"]:not([disabled])'
+  ))
+  const added = new Set<HTMLElement>()
+  const result: Clickable[] = []
+  for (const el of inputs) {
+    if (isVisible(el)) {
+      if (!added.has(el)) { added.add(el); result.push({ el }) }
+    } else {
+      let p = el.parentElement
+      while (p) {
+        if (isVisible(p)) { if (!added.has(p)) { added.add(p); result.push({ el: p, clickTarget: el }) } break }
+        p = p.parentElement
+      }
+    }
+  }
+  return result
+}
+
+function getFormControls(): Clickable[] {
+  const checkboxRadio = getCheckboxesAndRadios()
+  const selects = Array.from(document.querySelectorAll<HTMLElement>('select:not([disabled])')).filter(isVisible)
+  const added = new Set<HTMLElement>(checkboxRadio.map(c => c.el))
+  const result: Clickable[] = [...checkboxRadio]
+  for (const el of selects) {
+    if (!added.has(el)) { added.add(el); result.push({ el }) }
+  }
+  return result
+}
+
+function getLinksAndButtons(): Clickable[] {
+  const selector = [
+    'a[href]',
+    'button:not([disabled])',
+    '[onclick]',
+    '[role="button"]',
+    '[role="link"]',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(', ')
+
+  const fromSelector = new Set(Array.from(document.querySelectorAll<HTMLElement>(selector)))
+  const isFormControl = (el: HTMLElement) =>
+    (el instanceof HTMLInputElement && el.type !== 'submit') ||
+    el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement
+
+  const added = new Set<HTMLElement>()
+  const result: Clickable[] = []
+  const add = (el: HTMLElement, clickTarget?: HTMLElement) => {
+    if (!added.has(el)) { added.add(el); result.push({ el, clickTarget }) }
+  }
+
+  for (const el of Array.from(document.querySelectorAll<HTMLElement>('*'))) {
+    if (!isVisible(el)) continue
+    if (isFormControl(el)) continue
+    if (fromSelector.has(el)) {
+      add(el)
+    } else if (window.getComputedStyle(el).cursor === 'pointer' && !el.closest('svg')) {
+      add(el)
+    }
+  }
+  return result
+}
+
 export function beginHints(mode: HintMode): HintSession | null {
   const rawElements: HTMLElement[] | Clickable[] =
     (mode === 'y' || mode === 'ym') ? getCopyable()
@@ -221,6 +285,9 @@ export function beginHints(mode: HintMode): HintSession | null {
     : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : (mode === 'ctc' || mode === 'ctmc') ? getTableColumns()
+    : mode === 'ymf' ? getCheckboxesAndRadios()
+    : mode === 'c' ? getFormControls()
+    : (mode === 'f' || mode === 'F') ? getLinksAndButtons()
     : getClickable()
   if (rawElements.length === 0) return null
 

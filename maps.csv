@@ -7,8 +7,9 @@ gg,scrollToTop,Scroll to top of page
 G,scrollToBottom,Scroll to bottom of page
 H,historyBack,Go back in history
 L,historyForward,Go forward in history
-f,followLink,Follow link in same tab
+f,followLink,Follow link or button in same tab
 F,followLinkNewTab,Follow link in new tab
+c,followFormControl,Toggle checkbox / radio / select
 mf,followMultiClick,Click multiple elements then Enter
 oml,openMultiLinks,Open multiple links in new tabs
 A-h,hoverElement,Hover over element
@@ -16,8 +17,8 @@ yv,yankText,Copy text of element
 yl,yankLinkUrl,Copy link URL
 yi,yankInputText,Copy text from input
 ymv,yankMultiText,Copy multiple elements
-ci,copyImage,Copy image to clipboard
-cs,copySvg,Copy SVG code to clipboard
+ic,copyImage,Copy image to clipboard
+sc,copySvg,Copy SVG code to clipboard
 yc,copyTableColumn,Copy table column
 ymc,copyTableMultiColumn,Copy multiple table columns
 oI,openImage,Open image in new tab
@@ -50,7 +51,7 @@ sh,showSeoInfo,Show SEO meta info
 st,showSeoHeadings,Show heading structure (h1/h2/h3)
 ii,inputEditStart,Focus input and place cursor at start
 ie,inputEdit,Focus input and place cursor at end
-ic,inputClearEdit,Clear and focus input or textarea
+id,inputClearEdit,Clear and focus input or textarea
 zw,zoomFitWindow,Reset zoom (fit to window)
 zf,zoomFull,Zoom to 100%
 zi,zoomIn,Zoom in

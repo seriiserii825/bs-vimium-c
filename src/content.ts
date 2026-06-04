@@ -79,11 +79,15 @@ type Action =
   | "zoomFull"
   | "zoomIn"
   | "zoomOut"
+  | "followFormControl"
   | "goToTab";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
     session = beginHints("f");
+  },
+  followFormControl: () => {
+    session = beginHints("c");
   },
   followLinkNewTab: () => {
     session = beginHints("F");
