@@ -331,9 +331,9 @@ document.addEventListener(
       if (result !== "continue") {
         endHints(session);
         session = null;
-        // For f/F: return focus to page after the hint ends (done or Escape-cancel)
+        // For f/F/c: return focus to page after the hint ends (done or Escape-cancel)
         // Skip blur if a <select> is focused (user may have just opened a dropdown)
-        if (mode === 'f' || mode === 'F') {
+        if (mode === 'f' || mode === 'F' || mode === 'c') {
           const active = document.activeElement;
           if (!active || active.tagName.toLowerCase() !== 'select') {
             (active as HTMLElement)?.blur();
