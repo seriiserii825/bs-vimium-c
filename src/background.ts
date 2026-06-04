@@ -35,27 +35,29 @@ chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; current
   }
 
 
-  if (type === "moveTabToWindow") {
+  if (type === "getOtherWindowTabs") {
     (async () => {
       const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      const allWindows = await chrome.windows.getAll({ populate: true });
-      const otherWindows = allWindows.filter(w => w.id !== currentTab.windowId);
-      if (otherWindows.length === 0) return;
-      await chrome.storage.session.set({
-        currentTabId: currentTab.id,
-        windows: otherWindows.map(w => ({
-          id: w.id,
-          tabCount: w.tabs!.length,
-          tabs: w.tabs!.map(t => ({ title: t.title || t.url || "New Tab", active: t.active })),
-        })),
-      });
-      chrome.windows.create({
-        url: chrome.runtime.getURL("picker.html"),
-        type: "popup",
-        width: 520,
-        height: 360,
-        focused: true,
-      });
+      const allWindows = await chrome.windows.getAll({ populate: true, windowTypes: ['normal'] });
+      const windows = allWindows
+        .filter(w => w.id !== currentTab.windowId)
+        .map(w => ({
+          id: w.id!,
+          tabs: (w.tabs ?? [])
+            .sort((a, b) => a.index - b.index)
+            .map(t => ({ id: t.id!, title: t.title || '', url: t.url || '', favIconUrl: t.favIconUrl, active: t.active })),
+        }));
+      sendResponse({ windows });
+    })();
+    return true;
+  }
+
+  if (type === "moveTabToWindowId" && msg.targetWindowId !== undefined) {
+    (async () => {
+      const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      await chrome.tabs.move(currentTab.id!, { windowId: msg.targetWindowId!, index: -1 });
+      await chrome.tabs.update(currentTab.id!, { active: true });
+      await chrome.windows.update(msg.targetWindowId!, { focused: true });
     })();
     return;
   }

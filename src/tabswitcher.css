@@ -68,3 +68,72 @@
 .bs-ts-tab.bs-ts-current .bs-ts-title {
   color: #fff;
 }
+
+/* Window picker (W: move tab to window) */
+
+#bs-win-picker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e2e;
+  border-bottom: 2px solid #a6e3a1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  max-height: 50vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+#bs-win-picker::-webkit-scrollbar {
+  display: none;
+}
+
+.bs-wp-row {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border-bottom: 1px solid #313244;
+  flex-shrink: 0;
+  transition: opacity 0.05s;
+}
+
+.bs-wp-row:last-child {
+  border-bottom: none;
+}
+
+.bs-wp-row.bs-wp-dim {
+  opacity: 0.15;
+}
+
+.bs-wp-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-right: 1px solid #45475a;
+  flex-shrink: 0;
+  min-width: 52px;
+}
+
+.bs-wp-count {
+  font: 10px/1 sans-serif;
+  color: #6c7086;
+  white-space: nowrap;
+}
+
+.bs-wp-tabs {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+}
+
+.bs-wp-tabs::-webkit-scrollbar {
+  display: none;
+}

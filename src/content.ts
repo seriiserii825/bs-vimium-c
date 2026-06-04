@@ -8,7 +8,7 @@ import "./seoinfo.css";
 import "./seoheadings.css";
 import "./tabswitcher.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
-import { beginTabSwitch, typeTabSwitch, endTabSwitch, TabSwitchSession } from "./tabswitcher";
+import { beginTabSwitch, typeTabSwitch, endTabSwitch, TabSwitchSession, beginWindowPick, typeWindowPick, endWindowPick, WindowPickSession } from "./tabswitcher";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
 import { showPrompt, hidePrompt, isPromptVisible } from "./prompt";
 import { showWhichKey, hideWhichKey, isWhichKeyVisible } from "./whichkey";
@@ -21,6 +21,7 @@ import mappings from "../maps.csv";
 
 let session: HintSession | null = null;
 let tabSession: TabSwitchSession | null = null;
+let winSession: WindowPickSession | null = null;
 
 type Action =
   | "followLink"
@@ -174,7 +175,12 @@ const actions: Record<Action, () => void> = {
   reloadTabHard:    () => { chrome.runtime.sendMessage({ type: "reloadTabHard" }) },
   closeTabsRight:   () => { chrome.runtime.sendMessage({ type: "closeTabsRight" }) },
   closeTabsOthers:  () => { chrome.runtime.sendMessage({ type: "closeTabsOthers" }) },
-  moveTabToWindow:  () => { chrome.runtime.sendMessage({ type: "moveTabToWindow" }) },
+  moveTabToWindow: () => {
+    chrome.runtime.sendMessage({ type: "getOtherWindowTabs" }, (res) => {
+      if (!res?.windows?.length) return;
+      winSession = beginWindowPick(res.windows);
+    });
+  },
   imageInfo: () => {
     session = beginHints("ii");
   },
@@ -286,6 +292,20 @@ document.addEventListener(
 
     if (isPromptVisible()) {
       if (e.key === "Escape") { hidePrompt(); e.preventDefault(); }
+      return;
+    }
+
+    if (winSession) {
+      e.preventDefault();
+      e.stopPropagation();
+      const { result, windowId } = typeWindowPick(winSession, e.key);
+      if (result !== "continue") {
+        endWindowPick(winSession);
+        winSession = null;
+        if (result === "done" && windowId !== undefined) {
+          chrome.runtime.sendMessage({ type: "moveTabToWindowId", targetWindowId: windowId });
+        }
+      }
       return;
     }
 
