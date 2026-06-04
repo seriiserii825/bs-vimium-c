@@ -482,8 +482,15 @@ function activate(entry: HintEntry, mode: HintMode): void {
     const text = entry.el.innerText?.trim() || ''
     writeText(text)
     showToast(text)
-  } else if (mode === 'F' && entry.el instanceof HTMLAnchorElement && entry.el.href) {
-    window.open(entry.el.href, '_blank')
+  } else if (mode === 'F') {
+    const anchor = entry.el instanceof HTMLAnchorElement ? entry.el : entry.el.closest('a[href]')
+    if (anchor instanceof HTMLAnchorElement && anchor.href) {
+      window.open(anchor.href, '_blank')
+    } else {
+      const clickEl = entry.clickTarget ?? entry.el
+      clickEl.focus()
+      clickEl.click()
+    }
   } else if (mode === 'h') {
     unhoverLast()
     lastHovered = entry.el
