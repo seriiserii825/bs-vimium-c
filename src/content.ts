@@ -7,6 +7,7 @@ import "./imageinfo.css";
 import "./seoinfo.css";
 import "./seoheadings.css";
 import "./tabswitcher.css";
+import "./timecode.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
 import { beginTabSwitch, typeTabSwitch, endTabSwitch, TabSwitchSession, beginWindowPick, typeWindowPick, endWindowPick, WindowPickSession } from "./tabswitcher";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
@@ -16,6 +17,7 @@ import { showCookieConfirm, hideCookieConfirm, isCookieConfirmVisible } from "./
 import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { showSeoInfo, hideSeoInfo, isSeoInfoVisible } from "./seoinfo";
 import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seoheadings";
+import { showTimecode, hideTimecode, isTimecodeVisible } from "./timecode";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -81,7 +83,9 @@ type Action =
   | "zoomIn"
   | "zoomOut"
   | "followFormControl"
-  | "goToTab";
+  | "goToTab"
+  | "seekTimecode"
+  | "reloadExtension";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -205,6 +209,8 @@ const actions: Record<Action, () => void> = {
       tabSession = beginTabSwitch(res.tabs);
     });
   },
+  seekTimecode: () => { showTimecode() },
+  reloadExtension: () => { chrome.runtime.reload() },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
@@ -350,6 +356,7 @@ document.addEventListener(
       if (isImageInfoVisible()) { hideImageInfo(); e.preventDefault(); return; }
       if (isSeoInfoVisible()) { hideSeoInfo(); e.preventDefault(); return; }
       if (isSeoHeadingsVisible()) { hideSeoHeadings(); e.preventDefault(); return; }
+      if (isTimecodeVisible()) { hideTimecode(); e.preventDefault(); return; }
       if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
