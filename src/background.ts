@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number; ratio?: number; tabId?: number }, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number; ratio?: number; tabId?: number; quality?: string }, _sender, sendResponse) => {
   const type = msg.type;
 
   if (type === "getTabs") {
@@ -108,6 +108,44 @@ chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; current
         next = idx === -1 ? 0.9 : ZOOM_STEPS[Math.max(idx - 1, 0)];
       }
       chrome.tabs.setZoom(tab.id, next);
+    })();
+    return;
+  }
+
+  if (type === "getYoutubeQualities") {
+    (async () => {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab.id) { sendResponse(null); return; }
+      const results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        world: 'MAIN',
+        func: () => {
+          type YTPlayerGet = { getAvailableQualityLevels(): string[]; getPlaybackQuality(): string } | null;
+          const p = document.querySelector('#movie_player') as unknown as YTPlayerGet;
+          if (!p?.getAvailableQualityLevels) return null;
+          return { levels: p.getAvailableQualityLevels(), current: p.getPlaybackQuality() };
+        },
+      });
+      sendResponse(results?.[0]?.result ?? null);
+    })();
+    return true;
+  }
+
+  if (type === "setYoutubeQuality" && msg.quality) {
+    (async () => {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab.id) return;
+      const q = msg.quality!;
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        world: 'MAIN',
+        func: (quality: string) => {
+          type YTPlayerSet = { setPlaybackQualityRange(min: string, max: string): void } | null;
+          const p = document.querySelector('#movie_player') as unknown as YTPlayerSet;
+          if (p?.setPlaybackQualityRange) p.setPlaybackQualityRange(quality, quality);
+        },
+        args: [q],
+      });
     })();
     return;
   }

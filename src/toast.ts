@@ -1,11 +1,11 @@
-export function showToast(message: string): void {
+export function showToast(message: string, prefix = 'Copied: '): void {
   const existing = document.getElementById("bs-vimium-toast");
   if (existing) existing.remove();
 
   const toast = document.createElement("div");
   toast.id = "bs-vimium-toast";
   const preview = message.length > 60 ? message.slice(0, 60) + "…" : message;
-  toast.textContent = `Copied: ${preview}`;
+  toast.textContent = `${prefix}${preview}`;
   document.documentElement.appendChild(toast);
 
   requestAnimationFrame(() => {

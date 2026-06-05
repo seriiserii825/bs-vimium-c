@@ -18,6 +18,8 @@ import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { showSeoInfo, hideSeoInfo, isSeoInfoVisible } from "./seoinfo";
 import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seoheadings";
 import { showTimecode, hideTimecode, isTimecodeVisible } from "./timecode";
+import { applyBestQuality } from "./videoquality";
+import { showToast } from "./toast";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -84,7 +86,10 @@ type Action =
   | "zoomOut"
   | "followFormControl"
   | "goToTab"
-  | "seekTimecode";
+  | "seekTimecode"
+  | "speedUp"
+  | "speedDown"
+  | "videoQuality";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -209,6 +214,21 @@ const actions: Record<Action, () => void> = {
     });
   },
   seekTimecode: () => { showTimecode() },
+  speedUp: () => {
+    const video = document.querySelector('video')
+    if (!video) return
+    const rate = Math.min(Math.round((video.playbackRate + 0.25) * 100) / 100, 4)
+    video.playbackRate = rate
+    showToast(`${rate}×`, 'Speed: ')
+  },
+  speedDown: () => {
+    const video = document.querySelector('video')
+    if (!video) return
+    const rate = Math.max(Math.round((video.playbackRate - 0.25) * 100) / 100, 0.25)
+    video.playbackRate = rate
+    showToast(`${rate}×`, 'Speed: ')
+  },
+  videoQuality: () => { void applyBestQuality() },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
