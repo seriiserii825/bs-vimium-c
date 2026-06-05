@@ -171,7 +171,7 @@ export function showTimecode(): void {
     const histList = document.createElement('div')
     histList.id = 'bs-timecode-history'
 
-    ;[...history].reverse().forEach((entry) => {
+    ;[...history].sort((a, b) => a.seconds - b.seconds).forEach((entry) => {
       const item = document.createElement('div')
       item.className = 'bs-timecode-hist-item'
       item.tabIndex = 0
