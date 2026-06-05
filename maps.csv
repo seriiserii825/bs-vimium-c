@@ -57,7 +57,8 @@ zf,zoomFull,Zoom to 100%
 zi,zoomIn,Zoom in
 zo,zoomOut,Zoom out
 tc,seekTimecode,Go to video timecode (HH:MM:SS)
-su,speedUp,Speed up video (+0.25)
-sd,speedDown,Speed down video (-0.25)
+vu,speedUp,Speed up video (+0.25)
+vd,speedDown,Speed down video (-0.25)
 vq,videoQuality,Set video quality
+vf,videoFullscreen,Toggle video fullscreen
 ?,showHelp,Show keyboard shortcuts

@@ -89,7 +89,8 @@ type Action =
   | "seekTimecode"
   | "speedUp"
   | "speedDown"
-  | "videoQuality";
+  | "videoQuality"
+  | "videoFullscreen";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -229,6 +230,10 @@ const actions: Record<Action, () => void> = {
     showToast(`${rate}×`, 'Speed: ')
   },
   videoQuality: () => { void applyBestQuality() },
+  videoFullscreen: () => {
+    const btn = document.querySelector('.ytp-fullscreen-button') as HTMLElement | null
+    btn?.click()
+  },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
