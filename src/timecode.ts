@@ -142,13 +142,24 @@ export function showTimecode(): void {
   function hint(key: string, label: string): string {
     return `<span>${key}</span> ${label}`
   }
-  hintsBar.innerHTML = [
-    hint('↑ ↓', 'navigate'),
-    hint('← →', 'name / ×'),
+  function hintsRow(title: string, items: string[]): string {
+    return `<div><b>${title}</b>${items.join('<i></i>')}</div>`
+  }
+  hintsBar.innerHTML = hintsRow('popup', [
+    hint('↑↓', 'nav'),
+    hint('←→', 'name/×'),
     hint('Enter', 'seek'),
-    hint('Del', 'remove'),
     hint('q', 'close'),
-  ].join('<i></i>')
+  ]) + hintsRow('global', [
+    hint('tc', 'open'),
+    hint('ts', 'save'),
+    hint('te', 'export'),
+    hint('ti', 'import'),
+    hint('vu', '+spd'),
+    hint('vd', '−spd'),
+    hint('vq', 'quality'),
+    hint('vf', 'fullscr'),
+  ])
 
   panel.appendChild(header)
   panel.appendChild(row)
