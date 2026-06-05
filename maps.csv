@@ -57,5 +57,4 @@ zf,zoomFull,Zoom to 100%
 zi,zoomIn,Zoom in
 zo,zoomOut,Zoom out
 tc,seekTimecode,Go to video timecode (HH:MM:SS)
-zR,reloadExtension,Reload extension
 ?,showHelp,Show keyboard shortcuts

@@ -66,3 +66,64 @@
   line-height: 1;
   user-select: none;
 }
+
+#bs-timecode-history {
+  border-top: 1px solid #313244;
+}
+
+.bs-timecode-hist-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  font-size: 15px;
+  font-family: monospace;
+  color: #a6adc8;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.08s;
+}
+
+.bs-timecode-hist-item:hover,
+.bs-timecode-hist-item.focused {
+  background: #313244;
+  color: #cdd6f4;
+}
+
+.bs-timecode-hist-item.focused .bs-timecode-radio {
+  border-color: #89b4fa;
+  background: #89b4fa;
+  box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.25);
+}
+
+.bs-timecode-radio {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #585b70;
+  flex-shrink: 0;
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.bs-timecode-delete {
+  margin-left: auto;
+  padding: 0 4px;
+  font-size: 18px;
+  line-height: 1;
+  color: #585b70;
+  opacity: 0;
+  transition: opacity 0.1s, color 0.1s;
+  cursor: pointer;
+}
+
+.bs-timecode-hist-item:hover .bs-timecode-delete,
+.bs-timecode-hist-item.focused .bs-timecode-delete {
+  opacity: 1;
+}
+
+.bs-timecode-delete:hover,
+.bs-timecode-delete:focus {
+  color: #f38ba8;
+  opacity: 1;
+  outline: none;
+}

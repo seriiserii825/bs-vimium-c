@@ -84,8 +84,7 @@ type Action =
   | "zoomOut"
   | "followFormControl"
   | "goToTab"
-  | "seekTimecode"
-  | "reloadExtension";
+  | "seekTimecode";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -210,7 +209,6 @@ const actions: Record<Action, () => void> = {
     });
   },
   seekTimecode: () => { showTimecode() },
-  reloadExtension: () => { chrome.runtime.reload() },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);
