@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'bs-timecodes'
-const MAX_PER_VIDEO = 10
+const MAX_PER_VIDEO = 30
 
 interface TimecodeEntry {
   videoId: string
@@ -97,7 +97,7 @@ export function showTimecode(): void {
     const histList = document.createElement('div')
     histList.id = 'bs-timecode-history'
 
-    history.forEach((entry) => {
+    ;[...history].reverse().forEach((entry) => {
       const item = document.createElement('div')
       item.className = 'bs-timecode-hist-item'
       item.tabIndex = 0
@@ -276,6 +276,15 @@ function seekToTime(seconds: number): void {
   const url = new URL(window.location.href)
   url.searchParams.set('t', `${seconds}s`)
   window.location.href = url.href
+}
+
+export function saveCurrentTimecode(): void {
+  const videoId = getVideoId()
+  if (!videoId) return
+  const video = document.querySelector('video')
+  if (!video) return
+  saveEntry(videoId, Math.floor(video.currentTime))
+  showTimecode()
 }
 
 export function hideTimecode(): void {

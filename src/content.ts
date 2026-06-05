@@ -17,7 +17,7 @@ import { showCookieConfirm, hideCookieConfirm, isCookieConfirmVisible } from "./
 import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { showSeoInfo, hideSeoInfo, isSeoInfoVisible } from "./seoinfo";
 import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seoheadings";
-import { showTimecode, hideTimecode, isTimecodeVisible } from "./timecode";
+import { showTimecode, hideTimecode, isTimecodeVisible, saveCurrentTimecode } from "./timecode";
 import { applyBestQuality } from "./videoquality";
 import { showToast } from "./toast";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
@@ -87,6 +87,7 @@ type Action =
   | "followFormControl"
   | "goToTab"
   | "seekTimecode"
+  | "saveTimecode"
   | "speedUp"
   | "speedDown"
   | "videoQuality"
@@ -215,6 +216,7 @@ const actions: Record<Action, () => void> = {
     });
   },
   seekTimecode: () => { showTimecode() },
+  saveTimecode: () => { saveCurrentTimecode() },
   speedUp: () => {
     const video = document.querySelector('video')
     if (!video) return

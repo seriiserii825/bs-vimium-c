@@ -57,6 +57,7 @@ zf,zoomFull,Zoom to 100%
 zi,zoomIn,Zoom in
 zo,zoomOut,Zoom out
 tc,seekTimecode,Go to video timecode (HH:MM:SS)
+ts,saveTimecode,Save current video position as timecode
 vu,speedUp,Speed up video (+0.25)
 vd,speedDown,Speed down video (-0.25)
 vq,videoQuality,Set video quality
