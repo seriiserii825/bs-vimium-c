@@ -58,6 +58,8 @@ zi,zoomIn,Zoom in
 zo,zoomOut,Zoom out
 tc,seekTimecode,Go to video timecode (HH:MM:SS)
 ts,saveTimecode,Save current video position as timecode
+te,exportTimecodes,Export all timecodes to JSON file
+ti,importTimecodes,Import timecodes from JSON file
 vu,speedUp,Speed up video (+0.25)
 vd,speedDown,Speed down video (-0.25)
 vq,videoQuality,Set video quality

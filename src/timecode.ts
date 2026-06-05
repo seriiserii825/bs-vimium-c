@@ -1,9 +1,12 @@
+import { showPrompt } from './prompt'
+
 const STORAGE_KEY = 'bs-timecodes'
 const MAX_PER_VIDEO = 30
 
 interface TimecodeEntry {
   videoId: string
   seconds: number
+  name: string
 }
 
 function getVideoId(): string | null {
@@ -22,15 +25,22 @@ function loadEntries(): TimecodeEntry[] {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') } catch { return [] }
 }
 
-function saveEntry(videoId: string, seconds: number): void {
+function saveEntry(videoId: string, seconds: number, name: string): void {
   const all = loadEntries().filter(e => !(e.videoId === videoId && e.seconds === seconds))
   const forVideo = all.filter(e => e.videoId === videoId).slice(0, MAX_PER_VIDEO - 1)
   const others = all.filter(e => e.videoId !== videoId)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([{ videoId, seconds }, ...forVideo, ...others]))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([{ videoId, seconds, name }, ...forVideo, ...others]))
 }
 
 function deleteEntry(videoId: string, seconds: number): void {
   const all = loadEntries().filter(e => !(e.videoId === videoId && e.seconds === seconds))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
+}
+
+function renameEntry(videoId: string, seconds: number, name: string): void {
+  const all = loadEntries().map(e =>
+    e.videoId === videoId && e.seconds === seconds ? { ...e, name } : e
+  )
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
 }
 
@@ -50,12 +60,25 @@ export function showTimecode(): void {
   const panel = document.createElement('div')
   panel.id = 'bs-timecode'
 
+  const header = document.createElement('div')
+  header.id = 'bs-timecode-header'
+
   const label = document.createElement('div')
   label.id = 'bs-timecode-label'
   label.textContent = 'Go to time'
 
+  const toggleBtn = document.createElement('button')
+  toggleBtn.id = 'bs-timecode-toggle'
+  toggleBtn.textContent = '+'
+  toggleBtn.title = 'Enter time manually'
+  toggleBtn.tabIndex = 0
+
+  header.appendChild(label)
+  header.appendChild(toggleBtn)
+
   const row = document.createElement('div')
   row.id = 'bs-timecode-row'
+  row.hidden = true
 
   const inputs: HTMLInputElement[] = []
 
@@ -88,7 +111,20 @@ export function showTimecode(): void {
   row.appendChild(sep())
   row.appendChild(ss)
 
-  panel.appendChild(label)
+  function toggleRow(): void {
+    row.hidden = !row.hidden
+    toggleBtn.textContent = row.hidden ? '+' : '−'
+    if (!row.hidden) { hh.focus(); hh.select() }
+  }
+
+  toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleRow() })
+  toggleBtn.addEventListener('keydown', (e) => {
+    e.stopPropagation()
+    if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(); return }
+  })
+
+  panel.appendChild(header)
   panel.appendChild(row)
 
   // History items
@@ -106,7 +142,15 @@ export function showTimecode(): void {
       const radio = document.createElement('span')
       radio.className = 'bs-timecode-radio'
 
+      const nameInput = document.createElement('input')
+      nameInput.type = 'text'
+      nameInput.className = 'bs-timecode-name-input'
+      nameInput.value = entry.name
+      nameInput.placeholder = '—'
+      nameInput.spellcheck = false
+
       const timeLabel = document.createElement('span')
+      timeLabel.className = 'bs-timecode-time'
       timeLabel.textContent = formatTime(entry.seconds)
 
       const deleteBtn = document.createElement('span')
@@ -116,6 +160,7 @@ export function showTimecode(): void {
       deleteBtn.tabIndex = -1
 
       item.appendChild(radio)
+      item.appendChild(nameInput)
       item.appendChild(timeLabel)
       item.appendChild(deleteBtn)
       histList.appendChild(item)
@@ -133,9 +178,43 @@ export function showTimecode(): void {
         else { hh.focus(); hh.select() }
       }
 
+      function saveName(): void {
+        const newName = nameInput.value.trim()
+        if (videoId && newName !== entry.name) {
+          renameEntry(videoId, entry.seconds, newName)
+          entry.name = newName
+        }
+      }
+
+      nameInput.addEventListener('keydown', (e) => {
+        e.stopPropagation()
+        if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
+        if (e.key === 'Enter') { saveName(); item.focus(); return }
+        if (e.key === 'Escape') { nameInput.value = entry.name; item.focus(); return }
+        if (e.key === 'Tab' && !e.shiftKey) {
+          e.preventDefault(); saveName()
+          const next = historyItems[historyItems.indexOf(item) + 1]
+          if (next) next.querySelector<HTMLInputElement>('.bs-timecode-name-input')?.focus()
+          else hh.focus()
+          return
+        }
+        if (e.key === 'Tab' && e.shiftKey) {
+          e.preventDefault(); saveName()
+          const prev = historyItems[historyItems.indexOf(item) - 1]
+          if (prev) prev.querySelector<HTMLInputElement>('.bs-timecode-name-input')?.focus()
+          else { ss.focus(); ss.select() }
+          return
+        }
+      })
+      nameInput.addEventListener('blur', () => { saveName() })
+      nameInput.addEventListener('focus', () => {
+        historyItems.forEach(i => i.classList.remove('focused'))
+        item.classList.add('focused')
+      })
+
       item.addEventListener('keydown', (e) => {
         e.stopPropagation()
-        if (e.key === 'Escape') { hideTimecode(); return }
+        if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
         if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeItem(); return }
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
@@ -165,20 +244,20 @@ export function showTimecode(): void {
         if (e.key === 'ArrowUp') {
           e.preventDefault()
           const i = historyItems.indexOf(item)
-          if (i === 0) { ss.focus(); ss.select() }
+          if (i === 0) { if (!row.hidden) { ss.focus(); ss.select() } else toggleBtn.focus() }
           else historyItems[i - 1].focus()
           return
         }
         if (e.key === 'ArrowRight') {
           e.preventDefault()
-          deleteBtn.focus()
+          nameInput.focus()
           return
         }
       })
 
       deleteBtn.addEventListener('keydown', (e) => {
         e.stopPropagation()
-        if (e.key === 'Escape') { hideTimecode(); return }
+        if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); removeItem(); return }
         if (e.key === 'ArrowLeft') { e.preventDefault(); item.focus(); return }
       })
@@ -187,9 +266,12 @@ export function showTimecode(): void {
         historyItems.forEach(i => i.classList.remove('focused'))
         item.classList.add('focused')
       })
-      item.addEventListener('blur', () => { item.classList.remove('focused') })
+      item.addEventListener('blur', (e) => {
+        if (!item.contains(e.relatedTarget as Node)) item.classList.remove('focused')
+      })
       item.addEventListener('click', (e) => {
         if ((e.target as HTMLElement).closest('.bs-timecode-delete')) { removeItem(); return }
+        if ((e.target as HTMLElement).closest('.bs-timecode-name-input')) return
         hideTimecode()
         seekToTime(entry.seconds)
       })
@@ -206,13 +288,18 @@ export function showTimecode(): void {
   inputs.forEach((inp, idx) => {
     inp.addEventListener('keydown', (e) => {
       e.stopPropagation()
-      if (e.key === 'Escape') { hideTimecode(); return }
+      if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
+      if (e.key === 'Escape') { toggleRow(); return }
 
       if (e.key === 'Enter') {
         const total = getSeconds()
-        if (videoId) saveEntry(videoId, total)
         hideTimecode()
         seekToTime(total)
+        if (videoId) {
+          showPrompt('Timecode name', '', (name) => {
+            saveEntry(videoId, total, name)
+          })
+        }
         return
       }
 
@@ -226,6 +313,7 @@ export function showTimecode(): void {
       if (e.key === 'Tab' && e.shiftKey) {
         e.preventDefault()
         if (inputs[idx - 1]) { inputs[idx - 1].focus(); inputs[idx - 1].select() }
+        else toggleBtn.focus()
         return
       }
 
@@ -260,7 +348,10 @@ export function showTimecode(): void {
   })
 
   document.documentElement.appendChild(backdrop)
-  requestAnimationFrame(() => { hh.focus(); hh.select() })
+  requestAnimationFrame(() => {
+    if (historyItems[0]) historyItems[0].focus()
+    else toggleBtn.focus()
+  })
 
   function getSeconds(): number {
     const h = parseInt(hh.value || '0', 10)
@@ -283,8 +374,11 @@ export function saveCurrentTimecode(): void {
   if (!videoId) return
   const video = document.querySelector('video')
   if (!video) return
-  saveEntry(videoId, Math.floor(video.currentTime))
-  showTimecode()
+  const seconds = Math.floor(video.currentTime)
+  showPrompt('Timecode name', '', (name) => {
+    saveEntry(videoId, seconds, name)
+    showTimecode()
+  })
 }
 
 export function hideTimecode(): void {
@@ -294,4 +388,70 @@ export function hideTimecode(): void {
 
 export function isTimecodeVisible(): boolean {
   return backdrop !== null
+}
+
+export function exportTimecodes(): void {
+  const entries = loadEntries()
+  if (entries.length === 0) {
+    showToastLocal('Nothing to export', '')
+    return
+  }
+  const json = JSON.stringify(entries, null, 2)
+  const blob = new Blob([json], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'timecodes.json'
+  a.click()
+  URL.revokeObjectURL(url)
+  showToastLocal(`${entries.length} timecode${entries.length === 1 ? '' : 's'} exported`, '')
+}
+
+export function importTimecodes(): void {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.json,application/json'
+  input.addEventListener('change', () => {
+    const file = input.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result as string)
+        if (!Array.isArray(data)) throw new Error('expected array')
+        const incoming: TimecodeEntry[] = data
+          .filter((e): e is Record<string, unknown> =>
+            typeof e === 'object' && e !== null &&
+            typeof (e as Record<string, unknown>).videoId === 'string' &&
+            typeof (e as Record<string, unknown>).seconds === 'number'
+          )
+          .map(e => ({
+            videoId: e.videoId as string,
+            seconds: e.seconds as number,
+            name: typeof e.name === 'string' ? e.name : '',
+          }))
+        if (incoming.length === 0) { showToastLocal('No valid entries found', ''); return }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(incoming))
+        showToastLocal(`${incoming.length} timecode${incoming.length === 1 ? '' : 's'} imported`, '')
+      } catch {
+        showToastLocal('Invalid JSON file', '')
+      }
+    }
+    reader.readAsText(file)
+  })
+  input.click()
+}
+
+function showToastLocal(message: string, prefix: string): void {
+  const existing = document.getElementById('bs-vimium-toast')
+  if (existing) existing.remove()
+  const toast = document.createElement('div')
+  toast.id = 'bs-vimium-toast'
+  toast.textContent = prefix + message
+  document.documentElement.appendChild(toast)
+  requestAnimationFrame(() => { toast.classList.add('bs-vimium-toast-visible') })
+  setTimeout(() => {
+    toast.classList.remove('bs-vimium-toast-visible')
+    toast.addEventListener('transitionend', () => toast.remove(), { once: true })
+  }, 2500)
 }

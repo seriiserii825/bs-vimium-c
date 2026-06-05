@@ -17,7 +17,7 @@ import { showCookieConfirm, hideCookieConfirm, isCookieConfirmVisible } from "./
 import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { showSeoInfo, hideSeoInfo, isSeoInfoVisible } from "./seoinfo";
 import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seoheadings";
-import { showTimecode, hideTimecode, isTimecodeVisible, saveCurrentTimecode } from "./timecode";
+import { showTimecode, hideTimecode, isTimecodeVisible, saveCurrentTimecode, exportTimecodes, importTimecodes } from "./timecode";
 import { applyBestQuality } from "./videoquality";
 import { showToast } from "./toast";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
@@ -88,6 +88,8 @@ type Action =
   | "goToTab"
   | "seekTimecode"
   | "saveTimecode"
+  | "exportTimecodes"
+  | "importTimecodes"
   | "speedUp"
   | "speedDown"
   | "videoQuality"
@@ -217,6 +219,8 @@ const actions: Record<Action, () => void> = {
   },
   seekTimecode: () => { showTimecode() },
   saveTimecode: () => { saveCurrentTimecode() },
+  exportTimecodes: () => { exportTimecodes() },
+  importTimecodes: () => { importTimecodes() },
   speedUp: () => {
     const video = document.querySelector('video')
     if (!video) return
@@ -381,7 +385,6 @@ document.addEventListener(
       if (isImageInfoVisible()) { hideImageInfo(); e.preventDefault(); return; }
       if (isSeoInfoVisible()) { hideSeoInfo(); e.preventDefault(); return; }
       if (isSeoHeadingsVisible()) { hideSeoHeadings(); e.preventDefault(); return; }
-      if (isTimecodeVisible()) { hideTimecode(); e.preventDefault(); return; }
       if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
@@ -392,6 +395,8 @@ document.addEventListener(
       unhoverLast();
       return;
     }
+
+    if (isTimecodeVisible() && e.key === "q") { hideTimecode(); e.preventDefault(); return; }
 
     if (isEditing()) return;
     if (e.repeat) return; // ignore OS key-repeat, we handle held keys ourselves
