@@ -73,8 +73,21 @@ export function showTimecode(): void {
   toggleBtn.title = 'Enter time manually'
   toggleBtn.tabIndex = 0
 
+  const closeBtn = document.createElement('button')
+  closeBtn.id = 'bs-timecode-close'
+  closeBtn.textContent = '✕'
+  closeBtn.title = 'Close'
+  closeBtn.tabIndex = 0
+  closeBtn.addEventListener('click', () => hideTimecode())
+  closeBtn.addEventListener('keydown', (e) => {
+    e.stopPropagation()
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hideTimecode(); return }
+    if (e.key === 'q' || e.key === 'Q') { hideTimecode() }
+  })
+
   header.appendChild(label)
   header.appendChild(toggleBtn)
+  header.appendChild(closeBtn)
 
   const row = document.createElement('div')
   row.id = 'bs-timecode-row'
@@ -124,8 +137,22 @@ export function showTimecode(): void {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRow(); return }
   })
 
+  const hintsBar = document.createElement('div')
+  hintsBar.id = 'bs-timecode-hints'
+  function hint(key: string, label: string): string {
+    return `<span>${key}</span> ${label}`
+  }
+  hintsBar.innerHTML = [
+    hint('↑ ↓', 'navigate'),
+    hint('← →', 'name / ×'),
+    hint('Enter', 'seek'),
+    hint('Del', 'remove'),
+    hint('q', 'close'),
+  ].join('<i></i>')
+
   panel.appendChild(header)
   panel.appendChild(row)
+  panel.appendChild(hintsBar)
 
   // History items
   const historyItems: HTMLElement[] = []
@@ -191,6 +218,12 @@ export function showTimecode(): void {
         if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
         if (e.key === 'Enter') { saveName(); item.focus(); return }
         if (e.key === 'Escape') { nameInput.value = entry.name; item.focus(); return }
+        if (e.key === 'ArrowRight' && nameInput.selectionStart === nameInput.value.length) {
+          e.preventDefault(); saveName(); deleteBtn.focus(); return
+        }
+        if (e.key === 'ArrowLeft' && nameInput.selectionStart === 0) {
+          e.preventDefault(); saveName(); item.focus(); return
+        }
         if (e.key === 'Tab' && !e.shiftKey) {
           e.preventDefault(); saveName()
           const next = historyItems[historyItems.indexOf(item) + 1]
@@ -259,7 +292,8 @@ export function showTimecode(): void {
         e.stopPropagation()
         if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); removeItem(); return }
-        if (e.key === 'ArrowLeft') { e.preventDefault(); item.focus(); return }
+        if (e.key === 'Escape') { item.focus(); return }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); nameInput.focus(); return }
       })
 
       item.addEventListener('focus', () => {

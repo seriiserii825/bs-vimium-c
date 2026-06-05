@@ -380,6 +380,7 @@ document.addEventListener(
     }
 
     if (e.key === "Escape") {
+      if (isTimecodeVisible()) { e.preventDefault(); return; }
       if (isWhichKeyVisible()) { clearPending(); e.preventDefault(); return; }
       if (isCookieConfirmVisible()) { hideCookieConfirm(); e.preventDefault(); return; }
       if (isImageInfoVisible()) { hideImageInfo(); e.preventDefault(); return; }
