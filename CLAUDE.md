@@ -40,16 +40,20 @@ Hint placement: each hint is placed at the element's own `getBoundingClientRect(
 Hint modes:
 - `f` — follow link (click) in current tab
 - `F` — follow link in new tab
-- `y` — copy element `innerText` to clipboard
+- `c` — toggle checkbox / radio / select
+- `mf` — multi-click: click multiple elements then Enter
+- `yv` — copy element `innerText` to clipboard
 - `yl` — copy link `href` to clipboard
 - `yi` — copy input/textarea value (or placeholder if empty)
-- `ym` — multi-select copy: accumulate text from multiple elements, Enter to copy all joined by `\n`
-- `om` — multi-select open: open each selected link in background tab (no focus switch)
+- `ymv` — multi-select copy: accumulate text from multiple elements, Enter to copy all joined by `\n`
+- `oml` — multi-select open: open each selected link in background tab (no focus switch)
+- `yc` / `ymc` — copy table column / multiple table columns
 - `h` — hover element: activates CSS `:hover` via stylesheet rewriting + dispatches JS mouse events up ancestor chain
 - `di` — download image via `chrome.downloads`
-- `ci` — copy image to clipboard as PNG blob (canvas approach for cross-origin; requires HTTPS)
-- `oi` — open image src in new tab
-- `cs` — copy SVG code to clipboard; only top-level `<svg>` elements get hints (nested SVGs excluded)
+- `ic` — copy image to clipboard as PNG blob (canvas approach for cross-origin; requires HTTPS)
+- `oI` — open image src in new tab
+- `sc` — copy SVG code to clipboard; only top-level `<svg>` elements get hints (nested SVGs excluded)
+- `Ii` — show image info popup (dimensions, file size, type)
 
 **Hover system** (`hints.ts`) — `A-h` activates hover mode. Two-pronged approach:
 1. CSS injection: reads all page stylesheets, rewrites `:hover` → `[data-bs-hover]`, injects as `<style>` tag, adds `data-bs-hover` attribute to target and ancestors. Handles CSS `:hover` effects (e.g. WordPress row-actions).
@@ -62,7 +66,23 @@ Escape calls `unhoverLast()` which reverses both.
 
 **Scroll** (`scroll.ts`) — physics-based: constant velocity while key held, linear deceleration after keyup via `requestAnimationFrame`. `scrollToTop`/`scrollToBottom` cancel any in-flight animation before calling `window.scrollTo`.
 
-**Build** — Vite handles `content.ts` (IIFE, with CSS inlined). Background is built separately via an esbuild call in the `closeBundle` Vite plugin hook (Vite's Rollup pipeline can't produce a Manifest V3-compatible service worker directly). `manifest.json` is copied as-is.
+**WhichKey** (`whichkey.ts`) — after typing a prefix key (e.g. `y`, `o`, `v`), a panel appears at the bottom of the screen showing all available continuations. Grouped by next character; shows the description if the key is complete, or a `…` indicator if deeper chords exist. Dismissed on Escape or when the chord resolves.
+
+**Tab switcher** (`tabswitcher.ts`) — `gt` opens a visual overlay of all tabs in the current window, each labeled with a hint character. Typing a label activates that tab. `W` (moveTabToWindow) opens a similar overlay for picking which window to move the current tab to — this uses `picker.ts` / `picker.html` rendered in a popup window via `chrome.windows.create`.
+
+**Timecode** (`timecode.ts`) — YouTube-specific. `tc` opens a prompt to seek to a `HH:MM:SS` timestamp. `ts` saves the current position with a name prompt. `te`/`ti` export/import timecodes as JSON. Entries are stored in `localStorage` under `bs-timecodes`, keyed by YouTube video ID, max 30 per video.
+
+**SEO tools** — `sh` (`seoinfo.ts`) shows a panel with meta title, description, og/twitter tags, and canonical URL. `st` (`seoheadings.ts`) shows the heading structure (h1–h3) as an outline panel. Both panels close on Escape or a second keypress.
+
+**Cookie confirm** (`cookieconfirm.ts`) — `dc` shows a confirmation dialog before deleting all cookies for the current domain and reloading. Prevents accidental logouts.
+
+**Image info** (`imageinfo.ts`) — `Ii` hint mode shows a popup with image dimensions, file size, and MIME type fetched via a `HEAD` request.
+
+**Video quality / fullscreen** (`videoquality.ts`) — `vq` shows a quality picker for the current `<video>` element if it exposes quality levels. `vf` toggles fullscreen. `vu`/`vd` adjust playback rate by ±0.25.
+
+**Input focus** — `ii` focuses an input and places cursor at start; `ie` at end; `id` clears and focuses. These use hint overlays to select the target input/textarea.
+
+**Build** — Vite handles `content.ts` (IIFE, with all CSS inlined). `background.ts` and `picker.ts` are built separately via esbuild in the `closeBundle` hook (Vite's Rollup pipeline can't produce MV3-compatible service workers or popup scripts directly). `manifest.json`, `picker.html`, and icons are copied as-is.
 
 ## Source files
 
