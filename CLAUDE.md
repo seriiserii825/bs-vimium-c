@@ -89,15 +89,21 @@ Escape calls `unhoverLast()` which reverses both.
 | File | Purpose |
 |------|---------|
 | `content.ts` | Keyboard pipeline, action dispatch |
-| `background.ts` | Tab/download/navigation API calls |
+| `background.ts` | Tab/download/navigation API calls (service worker) |
+| `picker.ts` + `picker.html` | Popup window for window-pick UI (`W` action) |
 | `hints.ts` | All hint modes + hover logic |
-| `hints.css` | Hint overlay styles |
+| `tabswitcher.ts` | Tab/window picker overlays (`gt`, `W`) |
+| `whichkey.ts` | Prefix key disambiguation panel |
 | `scroll.ts` | Physics scroll |
-| `toast.ts` | Toast notifications |
+| `timecode.ts` | YouTube timecode save/seek/export/import |
+| `videoquality.ts` | Video quality picker + fullscreen + speed |
+| `seoinfo.ts` | SEO meta info panel |
+| `seoheadings.ts` | Heading structure panel |
+| `imageinfo.ts` | Image info popup (dimensions, size, type) |
+| `cookieconfirm.ts` | Delete-cookies confirmation dialog |
 | `help.ts` | Keyboard shortcuts popup |
-| `help.css` | Help popup styles |
 | `prompt.ts` | Reusable input prompt popup |
-| `prompt.css` | Prompt styles |
+| `toast.ts` | Toast notifications |
 | `clipboard.ts` | `writeText()` helper — uses `navigator.clipboard` when available, falls back to `execCommand('copy')` for HTTP pages |
 | `maps.csv` | All keybindings (single source of truth) |
 | `maps.d.ts` | TypeScript type for CSV import |
