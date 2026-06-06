@@ -7,25 +7,25 @@ gg,scrollToTop,Scroll to top of page,scroll
 G,scrollToBottom,Scroll to bottom of page,scroll
 H,historyBack,Go back in history,history
 L,historyForward,Go forward in history,history
-f,followLink,Follow link or button in same tab,click
+f,followLink,Follow link or button,click
 F,followLinkNewTab,Follow link in new tab,click
 c,followFormControl,Toggle checkbox / radio / select,click
-mf,followMultiClick,Click multiple elements then Enter,click
-oml,openMultiLinks,Open multiple links in new tabs,click
+cm,followMultiClick,Click multiple elements then Enter,click
+fm,openMultiLinks,Open multiple links,click
 A-h,hoverElement,Hover over element,click
 yv,yankText,Copy text of element,copy
 yl,yankLinkUrl,Copy link URL,copy
 yi,yankInputText,Copy text from input,copy
 ymv,yankMultiText,Copy multiple elements,copy
-Ic,copyImage,Copy image to clipboard,copy
-sc,copySvg,Copy SVG code to clipboard,copy
-yc,copyTableColumn,Copy table column,copy
-ymc,copyTableMultiColumn,Copy multiple table columns,copy
-oI,openImage,Open image in new tab,image
-di,downloadImage,Download image,image
+Tc,copyTableColumn,Copy table column,copy
+Tmc,copyTableMultiColumn,Copy multiple table columns,copy
+Sc,copySvg,Copy SVG code to clipboard,svg
+Io,openImage,Open image,image
+Ic,copyImage,Copy image to clipboard,image
+Id,downloadImage,Download image,image
 Ii,imageInfo,Show image info popup,image
-ue,editUrlCurrentTab,Edit URL and open in current tab,url
-uE,editUrlNewTab,Edit URL and open in new tab,url
+ue,editUrlCurrentTab,Edit URL and open,url
+uE,editUrlNewTab,Edit URL and open in new,url
 gu,goUpUrl,Go one level up in URL,url
 gU,goRootUrl,Go to root URL,url
 ge,goExtensions,Go to chrome://extensions,url
@@ -56,10 +56,10 @@ zw,zoomFitWindow,Reset zoom (fit to window),zoom
 zf,zoomFull,Zoom to 100%,zoom
 zi,zoomIn,Zoom in,zoom
 zo,zoomOut,Zoom out,zoom
-tc,seekTimecode,Go to video timecode (HH:MM:SS),timecode
-ts,saveTimecode,Save current video position as timecode,timecode
-te,exportTimecodes,Export all timecodes to JSON file,timecode
-ti,importTimecodes,Import timecodes from JSON file,timecode
+mc,seekTimecode,Go to video timecode (HH:MM:SS),timecode
+ms,saveTimecode,Save current video position as timecode,timecode
+me,exportTimecodes,Export all timecodes to JSON file,timecode
+mi,importTimecodes,Import timecodes from JSON file,timecode
 vu,speedUp,Speed up video (+0.25),video
 vd,speedDown,Speed down video (-0.25),video
 vq,videoQuality,Set video quality,video

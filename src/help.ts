@@ -38,6 +38,10 @@ export function showHelp(mappings: Mapping[]): void {
   const body = document.createElement("div");
   body.id = "bs-vimium-help-body";
 
+  const cols = document.createElement("div");
+  cols.id = "bs-vimium-help-cols";
+  body.appendChild(cols);
+
   type Row = { el: HTMLElement; groupHeader: HTMLElement; hotkey: string; desc: string };
   const rows: Row[] = [];
   let currentGroup = "";
@@ -52,7 +56,7 @@ export function showHelp(mappings: Mapping[]): void {
       groupLabel.className = "bs-vimium-help-group";
       groupLabel.textContent = group;
       groupRow.appendChild(groupLabel);
-      body.appendChild(groupRow);
+      cols.appendChild(groupRow);
       currentGroupHeader = groupRow;
     }
 
@@ -71,7 +75,7 @@ export function showHelp(mappings: Mapping[]): void {
 
     row.appendChild(keyCell);
     row.appendChild(descCell);
-    body.appendChild(row);
+    cols.appendChild(row);
     rows.push({ el: row, groupHeader: currentGroupHeader!, hotkey: hotkey.toLowerCase(), desc: description.toLowerCase() });
   }
 
@@ -86,7 +90,7 @@ export function showHelp(mappings: Mapping[]): void {
     for (const r of rows) {
       r.groupHeader.style.display = !q || visibleHeaders.has(r.groupHeader) ? "" : "none";
     }
-    body.style.columns = q ? "1" : "";
+    cols.style.columns = q ? "1" : "";
   });
 
   panel.appendChild(header);
@@ -98,6 +102,7 @@ export function showHelp(mappings: Mapping[]): void {
   });
 
   backdrop.addEventListener("keydown", (e) => {
+    if (document.activeElement === search) return;
     if (e.key === "j") { e.preventDefault(); e.stopPropagation(); body.scrollBy(0, 80); }
     else if (e.key === "k") { e.preventDefault(); e.stopPropagation(); body.scrollBy(0, -80); }
   }, true);

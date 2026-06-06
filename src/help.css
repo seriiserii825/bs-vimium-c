@@ -14,7 +14,7 @@
   border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   width: 820px;
-  max-height: 80vh;
+  height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
   font-family: monospace;
@@ -70,9 +70,14 @@
 
 #bs-vimium-help-body {
   overflow-y: auto;
-  padding: 8px 0;
+  flex: 1;
+  min-height: 0;
+}
+
+#bs-vimium-help-cols {
   columns: 2;
   column-rule: 1px solid #313244;
+  padding: 8px 0;
 }
 
 .bs-vimium-help-row {

@@ -451,3 +451,10 @@ document.addEventListener(
   },
   true,
 );
+
+chrome.storage.local.get("reloadedToast", (res) => {
+  if (res.reloadedToast) {
+    chrome.storage.local.remove("reloadedToast");
+    showToast("Extension reloaded", "");
+  }
+});

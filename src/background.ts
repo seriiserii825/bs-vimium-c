@@ -1,23 +1,9 @@
 (async () => {
   const res = await chrome.storage.local.get("reloadedToast");
   if (!res.reloadedToast) return;
-  await chrome.storage.local.remove("reloadedToast");
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
-  chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    func: () => {
-      const t = document.createElement("div");
-      t.textContent = "Extension reloaded";
-      t.style.cssText = "position:fixed;top:20px;right:20px;background:#1e1e2e;color:#a6e3a1;font:13px/1.4 monospace;padding:10px 18px;border-radius:10px;border:1px solid #313244;z-index:2147483647;pointer-events:none;opacity:0;transform:translateY(6px);transition:opacity .15s,transform .15s;white-space:nowrap;box-shadow:0 8px 32px #0009";
-      document.documentElement.appendChild(t);
-      requestAnimationFrame(() => { t.style.opacity = "1"; t.style.transform = "translateY(0)"; });
-      setTimeout(() => {
-        t.style.opacity = "0";
-        t.addEventListener("transitionend", () => t.remove(), { once: true });
-      }, 2500);
-    },
-  });
+  chrome.tabs.reload(tab.id);
 })();
 
 chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number; ratio?: number; tabId?: number; quality?: string }, _sender, sendResponse) => {
