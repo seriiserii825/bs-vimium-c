@@ -26,8 +26,8 @@ export default defineConfig({
         const data = rows
           .filter(r => r.trim())
           .map(row => {
-            const [hotkey, action, description] = row.split(',').map(s => s.trim())
-            return { hotkey, action, description }
+            const [hotkey, action, description, group] = row.split(',').map(s => s.trim())
+            return { hotkey, action, description, group: group || '' }
           })
         return { code: `export default ${JSON.stringify(data)}`, map: null }
       },

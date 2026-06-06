@@ -78,8 +78,8 @@
 .bs-vimium-help-row {
   display: flex;
   align-items: center;
-  padding: 5px 20px;
-  gap: 16px;
+  padding: 3px 12px;
+  gap: 10px;
   break-inside: avoid;
 }
 
@@ -88,7 +88,7 @@
 }
 
 .bs-vimium-help-key {
-  min-width: 80px;
+  min-width: 50px;
   text-align: right;
   flex-shrink: 0;
 }
@@ -99,13 +99,23 @@
   border: 1px solid #45475a;
   border-radius: 4px;
   padding: 2px 7px;
-  font-size: 12px;
+  font-size: 10px;
   color: #f38ba8;
   font-family: monospace;
 }
 
 .bs-vimium-help-desc {
-  font-size: 13px;
+  font-size: 11px;
   font-family: sans-serif;
   color: #bac2de;
+}
+
+.bs-vimium-help-group {
+  font-size: 9px;
+  font-weight: 600;
+  font-family: sans-serif;
+  color: #cba6f7;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 0;
 }

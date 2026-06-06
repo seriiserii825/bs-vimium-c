@@ -399,6 +399,8 @@ document.addEventListener(
 
     if (isTimecodeVisible() && e.key === "q") { hideTimecode(); e.preventDefault(); return; }
 
+    if (isHelpVisible()) return;
+
     if (isEditing()) return;
     if (e.repeat) return; // ignore OS key-repeat, we handle held keys ourselves
 
