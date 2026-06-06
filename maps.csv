@@ -1,67 +1,67 @@
-hotkey,action,description
-j,scrollDown,Scroll down
-k,scrollUp,Scroll up
-J,slowScrollDown,Scroll down slowly
-K,slowScrollUp,Scroll up slowly
-gg,scrollToTop,Scroll to top of page
-G,scrollToBottom,Scroll to bottom of page
-H,historyBack,Go back in history
-L,historyForward,Go forward in history
-f,followLink,Follow link or button in same tab
-F,followLinkNewTab,Follow link in new tab
-c,followFormControl,Toggle checkbox / radio / select
-mf,followMultiClick,Click multiple elements then Enter
-oml,openMultiLinks,Open multiple links in new tabs
-A-h,hoverElement,Hover over element
-yv,yankText,Copy text of element
-yl,yankLinkUrl,Copy link URL
-yi,yankInputText,Copy text from input
-ymv,yankMultiText,Copy multiple elements
-ic,copyImage,Copy image to clipboard
-sc,copySvg,Copy SVG code to clipboard
-yc,copyTableColumn,Copy table column
-ymc,copyTableMultiColumn,Copy multiple table columns
-oI,openImage,Open image in new tab
-oi,openIncognito,Open current tab in incognito window
-di,downloadImage,Download image
-Ii,imageInfo,Show image info popup
-eu,editUrlCurrentTab,Edit URL and open in current tab
-eU,editUrlNewTab,Edit URL and open in new tab
-gu,goUpUrl,Go one level up in URL
-gU,goRootUrl,Go to root URL
-gt,goToTab,Switch to tab in current window
-N,prevTab,Switch to previous tab
-M,nextTab,Switch to next tab
->>,moveTabRight,Move tab right
-<<,moveTabLeft,Move tab left
-yt,duplicateTab,Duplicate current tab
-nt,newTab,Open new tab
-x,closeTab,Close current tab
-X,restoreTab,Restore last closed tab
-r,reloadTab,Reload current tab
-R,reloadTabHard,Reload tab bypassing cache
-dr,closeTabsRight,Close tabs to the right
-da,closeTabsOthers,Close all other tabs
-dc,deleteCookiesRefresh,Delete cookies for domain and refresh
-ge,goExtensions,Go to chrome://extensions
-gk,goExtensionShortcuts,Go to extension shortcuts
-gd,goDownloads,Go to downloads
-W,moveTabToWindow,Move tab to another window
-sh,showSeoInfo,Show SEO meta info
-st,showSeoHeadings,Show heading structure (h1/h2/h3)
-ii,inputEditStart,Focus input and place cursor at start
-ie,inputEdit,Focus input and place cursor at end
-id,inputClearEdit,Clear and focus input or textarea
-zw,zoomFitWindow,Reset zoom (fit to window)
-zf,zoomFull,Zoom to 100%
-zi,zoomIn,Zoom in
-zo,zoomOut,Zoom out
-tc,seekTimecode,Go to video timecode (HH:MM:SS)
-ts,saveTimecode,Save current video position as timecode
-te,exportTimecodes,Export all timecodes to JSON file
-ti,importTimecodes,Import timecodes from JSON file
-vu,speedUp,Speed up video (+0.25)
-vd,speedDown,Speed down video (-0.25)
-vq,videoQuality,Set video quality
-vf,videoFullscreen,Toggle video fullscreen
+hotkey,action,description,group
+j,scrollDown,Scroll down,scroll
+k,scrollUp,Scroll u,scroll
+J,slowScrollDown,Scroll down slowly,scroll
+K,slowScrollUp,Scroll up slowly,scroll
+gg,scrollToTop,Scroll to top of page,scroll
+G,scrollToBottom,Scroll to bottom of page,scroll
+H,historyBack,Go back in history,history
+L,historyForward,Go forward in history,history
+f,followLink,Follow link or button in same tab,click
+F,followLinkNewTab,Follow link in new tab,click
+c,followFormControl,Toggle checkbox / radio / select,click
+mf,followMultiClick,Click multiple elements then Enter,click
+oml,openMultiLinks,Open multiple links in new tabs,click
+A-h,hoverElement,Hover over element,click
+yv,yankText,Copy text of element,copy
+yl,yankLinkUrl,Copy link URL,copy
+yi,yankInputText,Copy text from input,copy
+ymv,yankMultiText,Copy multiple elements,copy
+Ic,copyImage,Copy image to clipboard,copy
+sc,copySvg,Copy SVG code to clipboard,copy
+yc,copyTableColumn,Copy table column,copy
+ymc,copyTableMultiColumn,Copy multiple table columns,copy
+oI,openImage,Open image in new tab,open
+oi,openIncognito,Open current tab in in,opencognito window
+di,downloadImage,Download image,image
+Ii,imageInfo,Show image info popup,image
+ue,editUrlCurrentTab,Edit URL and open in current tab,url
+uE,editUrlNewTab,Edit URL and open in new tab,url
+gu,goUpUrl,Go one level up in URL,url
+gU,goRootUrl,Go to root URL,url
+ge,goExtensions,Go to chrome://extensions,url
+gk,goExtensionShortcuts,Go to extension shortcuts,url
+gd,goDownloads,Go to downloads,url
+dc,deleteCookiesRefresh,Delete cookies for domain and refresh,url
+tg,goToTab,Switch to tab in current window,tab
+N,prevTab,Switch to previous tab,tab
+M,nextTab,Switch to next tab,tab
+>>,moveTabRight,Move tab right,tab
+<<,moveTabLeft,Move tab left,tab
+ty,duplicateTab,Duplicate current tab,tab
+tn,newTab,Open new tab,tab
+x,closeTab,Close current tab,tab
+X,restoreTab,Restore last closed tab,tab
+r,reloadTab,Reload current tab,tab
+R,reloadTabHard,Reload tab bypassing cache,tab
+tr,closeTabsRight,Close tabs to the right,tab
+ta,closeTabsOthers,Close all other tabs,tab
+tw,moveTabToWindow,Move tab to another window,tab
+sh,showSeoInfo,Show SEO meta info,seo
+st,showSeoHeadings,Show heading structure (h1/h2/h3),seo
+ie,inputEditStart,Focus input and place cursor at start,input
+ia,inputEdit,Focus input and place cursor at end,input
+ic,inputClearEdit,Clear and focus input or textarea,input
+zw,zoomFitWindow,Reset zoom (fit to window),zoom
+zf,zoomFull,Zoom to 100%,zoom
+zi,zoomIn,Zoom in,zoom
+zo,zoomOut,Zoom out,zoom
+tc,seekTimecode,Go to video timecode (HH:MM:SS),timecode
+ts,saveTimecode,Save current video position as timecode,timecode
+te,exportTimecodes,Export all timecodes to JSON file,timecode
+ti,importTimecodes,Import timecodes from JSON file,timecode
+vu,speedUp,Speed up video (+0.25),video
+vd,speedDown,Speed down video (-0.25),video
+vq,videoQuality,Set video quality,video
+vf,videoFullscreen,Toggle video fullscreen,video
 ?,showHelp,Show keyboard shortcuts
