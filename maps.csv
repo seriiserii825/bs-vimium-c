@@ -8,10 +8,10 @@ G,scrollToBottom,Scroll to bottom of page,scroll
 H,historyBack,Go back in history,history
 L,historyForward,Go forward in history,history
 f,followLink,Follow link or button,click
+fm,openMultiLinks,Open multiple links,click
 F,followLinkNewTab,Follow link in new tab,click
 c,followFormControl,Toggle checkbox / radio / select,click
 cm,followMultiClick,Click multiple elements then Enter,click
-fm,openMultiLinks,Open multiple links,click
 A-h,hoverElement,Hover over element,click
 yv,yankText,Copy text of element,copy
 yl,yankLinkUrl,Copy link URL,copy
