@@ -168,6 +168,11 @@ chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; current
     return;
   }
 
+  if (type === "reloadExtension") {
+    chrome.runtime.reload();
+    return;
+  }
+
   if (type === "navigateTo" && msg.url) {
     chrome.tabs.create({ url: msg.url, active: true });
     return;

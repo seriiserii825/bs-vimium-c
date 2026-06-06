@@ -93,7 +93,8 @@ type Action =
   | "speedUp"
   | "speedDown"
   | "videoQuality"
-  | "videoFullscreen";
+  | "videoFullscreen"
+  | "reloadExtension";
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -236,6 +237,7 @@ const actions: Record<Action, () => void> = {
     showToast(`${rate}×`, 'Speed: ')
   },
   videoQuality: () => { void applyBestQuality() },
+  reloadExtension: () => { chrome.runtime.sendMessage({ type: "reloadExtension" }) },
   videoFullscreen: () => {
     const btn = document.querySelector('.ytp-fullscreen-button') as HTMLElement | null
     btn?.click()

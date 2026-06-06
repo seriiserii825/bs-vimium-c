@@ -21,8 +21,7 @@ Ic,copyImage,Copy image to clipboard,copy
 sc,copySvg,Copy SVG code to clipboard,copy
 yc,copyTableColumn,Copy table column,copy
 ymc,copyTableMultiColumn,Copy multiple table columns,copy
-oI,openImage,Open image in new tab,open
-oi,openIncognito,Open current tab in in,opencognito window
+oI,openImage,Open image in new tab,image
 di,downloadImage,Download image,image
 Ii,imageInfo,Show image info popup,image
 ue,editUrlCurrentTab,Edit URL and open in current tab,url
@@ -47,6 +46,7 @@ R,reloadTabHard,Reload tab bypassing cache,tab
 tr,closeTabsRight,Close tabs to the right,tab
 ta,closeTabsOthers,Close all other tabs,tab
 tw,moveTabToWindow,Move tab to another window,tab
+oi,openIncognito,Open current tab in in,opencognito window
 sh,showSeoInfo,Show SEO meta info,seo
 st,showSeoHeadings,Show heading structure (h1/h2/h3),seo
 ie,inputEditStart,Focus input and place cursor at start,input
@@ -64,4 +64,5 @@ vu,speedUp,Speed up video (+0.25),video
 vd,speedDown,Speed down video (-0.25),video
 vq,videoQuality,Set video quality,video
 vf,videoFullscreen,Toggle video fullscreen,video
-?,showHelp,Show keyboard shortcuts
+?,showHelp,Show keyboard shortcuts,dev
+xr,reloadExtension,Reload extension,dev
