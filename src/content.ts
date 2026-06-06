@@ -237,7 +237,7 @@ const actions: Record<Action, () => void> = {
     showToast(`${rate}×`, 'Speed: ')
   },
   videoQuality: () => { void applyBestQuality() },
-  reloadExtension: () => { chrome.runtime.sendMessage({ type: "reloadExtension" }) },
+  reloadExtension: () => { try { chrome.runtime.sendMessage({ type: "reloadExtension" }) } catch {} },
   videoFullscreen: () => {
     const btn = document.querySelector('.ytp-fullscreen-button') as HTMLElement | null
     btn?.click()
