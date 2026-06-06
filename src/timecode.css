@@ -240,20 +240,16 @@
   font-size: 18px;
   line-height: 1;
   color: #585b70;
-  opacity: 0;
-  transition: opacity 0.1s, color 0.1s;
+  transition: color 0.1s;
   cursor: pointer;
+  background: none;
+  border: none;
 }
 
-.bs-timecode-hist-item:hover .bs-timecode-delete,
-.bs-timecode-hist-item.focused .bs-timecode-delete {
-  opacity: 1;
-}
 
 .bs-timecode-delete:hover,
 .bs-timecode-delete:focus {
   color: #f38ba8;
-  opacity: 1;
   outline: none;
 }
 

@@ -191,11 +191,12 @@ export function showTimecode(): void {
       timeLabel.className = 'bs-timecode-time'
       timeLabel.textContent = formatTime(entry.seconds)
 
-      const deleteBtn = document.createElement('span')
+      const deleteBtn = document.createElement('button')
       deleteBtn.className = 'bs-timecode-delete'
       deleteBtn.textContent = '×'
       deleteBtn.title = 'Delete'
       deleteBtn.tabIndex = -1
+      deleteBtn.type = 'button'
 
       item.appendChild(radio)
       item.appendChild(nameInput)
