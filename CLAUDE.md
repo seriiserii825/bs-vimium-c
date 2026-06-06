@@ -26,10 +26,12 @@ This is a Manifest V3 Chrome extension with two independent scripts built from `
 
 **background.ts** — service worker. Receives messages from content and executes them using `chrome.tabs` / `chrome.sessions` / `chrome.downloads` APIs. Message types: `openTab`, `navigateTo`, `downloadImage`, plus the standard tab management types in `knownTypes`.
 
-**Hotkey system** — `maps.csv` is the single source of truth for all keybindings. Columns: `hotkey`, `action`, `description`. Hotkeys support:
+**Hotkey system** — `maps.csv` is the single source of truth for all keybindings. Columns: `hotkey`, `action`, `description`, `group`. Hotkeys support:
 - Single keys: `f`, `G`, `x`
 - N-char chords: `gg`, `yv`, `ymv`, `oml` (prefix keys are auto-detected at build time)
 - Alt combos: `A-h` prefix notation (e.g. `A-h` = Alt+H)
+
+The `group` column is used by the help popup (`help.ts`) for display grouping. Defined groups: `scroll`, `history`, `click`, `copy`, `svg`, `image`, `url`, `tab`, `seo`, `input`, `zoom`, `timecode`, `video`, `dev`.
 
 Adding a new action requires: a new row in `maps.csv`, a new entry in the `Action` union type in `content.ts`, and a handler in the `actions` record. For background actions, also handle the message type in `background.ts`.
 
@@ -37,22 +39,22 @@ Adding a new action requires: a new row in `maps.csv`, a new entry in the `Actio
 
 Hint placement: each hint is placed at the element's own `getBoundingClientRect()` top-left. `getClickable()` excludes elements inside `<svg>` from the cursor-pointer check (they only inherit cursor and are not independently clickable), preventing duplicate stacked hints on icon buttons.
 
-Hint modes:
+Hint modes (hotkeys are from `maps.csv` — check there for the authoritative list):
 - `f` — follow link (click) in current tab
 - `F` — follow link in new tab
 - `c` — toggle checkbox / radio / select
-- `mf` — multi-click: click multiple elements then Enter
+- `fm` — open multiple links in background tabs (Enter to finish)
+- `cm` — multi-click: click multiple elements then Enter
 - `yv` — copy element `innerText` to clipboard
 - `yl` — copy link `href` to clipboard
 - `yi` — copy input/textarea value (or placeholder if empty)
 - `ymv` — multi-select copy: accumulate text from multiple elements, Enter to copy all joined by `\n`
-- `oml` — multi-select open: open each selected link in background tab (no focus switch)
-- `yc` / `ymc` — copy table column / multiple table columns
-- `h` — hover element: activates CSS `:hover` via stylesheet rewriting + dispatches JS mouse events up ancestor chain
-- `di` — download image via `chrome.downloads`
-- `ic` — copy image to clipboard as PNG blob (canvas approach for cross-origin; requires HTTPS)
-- `oI` — open image src in new tab
-- `sc` — copy SVG code to clipboard; only top-level `<svg>` elements get hints (nested SVGs excluded)
+- `Tc` / `Tmc` — copy table column / multiple table columns
+- `A-h` — hover element: activates CSS `:hover` via stylesheet rewriting + dispatches JS mouse events up ancestor chain
+- `Id` — download image via `chrome.downloads`
+- `Ic` — copy image to clipboard as PNG blob (canvas approach for cross-origin; requires HTTPS)
+- `Io` — open image src in new tab
+- `Sc` — copy SVG code to clipboard; only top-level `<svg>` elements get hints (nested SVGs excluded)
 - `Ii` — show image info popup (dimensions, file size, type)
 
 **Hover system** (`hints.ts`) — `A-h` activates hover mode. Two-pronged approach:
@@ -62,15 +64,15 @@ Escape calls `unhoverLast()` which reverses both.
 
 **Help popup** (`help.ts` / `help.css`) — `?` opens a centered modal listing all hotkeys from `maps.csv` in a 2-column grid. Escape / click backdrop / `×` closes it.
 
-**Prompt** (`prompt.ts` / `prompt.css`) — reusable inline input popup. `showPrompt(label, initialValue, onConfirm)`. Used by `eu` (edit URL → current tab) and `eU` (edit URL → new tab). Enter confirms, Escape cancels.
+**Prompt** (`prompt.ts` / `prompt.css`) — reusable inline input popup. `showPrompt(label, initialValue, onConfirm)`. Used by `ue` (edit URL → current tab) and `uE` (edit URL → new tab). Enter confirms, Escape cancels.
 
 **Scroll** (`scroll.ts`) — physics-based: constant velocity while key held, linear deceleration after keyup via `requestAnimationFrame`. `scrollToTop`/`scrollToBottom` cancel any in-flight animation before calling `window.scrollTo`.
 
 **WhichKey** (`whichkey.ts`) — after typing a prefix key (e.g. `y`, `o`, `v`), a panel appears at the bottom of the screen showing all available continuations. Grouped by next character; shows the description if the key is complete, or a `…` indicator if deeper chords exist. Dismissed on Escape or when the chord resolves.
 
-**Tab switcher** (`tabswitcher.ts`) — `gt` opens a visual overlay of all tabs in the current window, each labeled with a hint character. Typing a label activates that tab. `W` (moveTabToWindow) opens a similar overlay for picking which window to move the current tab to — this uses `picker.ts` / `picker.html` rendered in a popup window via `chrome.windows.create`.
+**Tab switcher** (`tabswitcher.ts`) — `tg` opens a visual overlay of all tabs in the current window, each labeled with a hint character. Typing a label activates that tab. `tw` (moveTabToWindow) opens a similar overlay for picking which window to move the current tab to — this uses `picker.ts` / `picker.html` rendered in a popup window via `chrome.windows.create`.
 
-**Timecode** (`timecode.ts`) — YouTube-specific. `tc` opens a prompt to seek to a `HH:MM:SS` timestamp. `ts` saves the current position with a name prompt. `te`/`ti` export/import timecodes as JSON. Entries are stored in `localStorage` under `bs-timecodes`, keyed by YouTube video ID, max 30 per video.
+**Timecode** (`timecode.ts`) — YouTube-specific. `mc` opens a prompt to seek to a `HH:MM:SS` timestamp. `ms` saves the current position with a name prompt. `me`/`mi` export/import timecodes as JSON. Entries are stored in `localStorage` under `bs-timecodes`, keyed by YouTube video ID, max 30 per video.
 
 **SEO tools** — `sh` (`seoinfo.ts`) shows a panel with meta title, description, og/twitter tags, and canonical URL. `st` (`seoheadings.ts`) shows the heading structure (h1–h3) as an outline panel. Both panels close on Escape or a second keypress.
 
@@ -78,11 +80,13 @@ Escape calls `unhoverLast()` which reverses both.
 
 **Image info** (`imageinfo.ts`) — `Ii` hint mode shows a popup with image dimensions, file size, and MIME type fetched via a `HEAD` request.
 
-**Video quality / fullscreen** (`videoquality.ts`) — `vq` shows a quality picker for the current `<video>` element if it exposes quality levels. `vf` toggles fullscreen. `vu`/`vd` adjust playback rate by ±0.25.
+**Video quality / fullscreen** (`videoquality.ts`) — `vq` shows a quality picker for the current `<video>` element if it exposes quality levels. `vf` toggles fullscreen (clicks `.ytp-fullscreen-button`, YouTube-specific). `vu`/`vd` adjust playback rate by ±0.25; current rate shown via a toast notification.
 
-**Input focus** — `ii` focuses an input and places cursor at start; `ie` at end; `id` clears and focuses. These use hint overlays to select the target input/textarea.
+**Zoom** — `zw` resets zoom to fit the page width; `zf` resets to 100%; `zi`/`zo` zoom in/out. All send messages to background which calls `chrome.tabs.setZoom`.
 
-**Build** — Vite handles `content.ts` (IIFE, with all CSS inlined). `background.ts` and `picker.ts` are built separately via esbuild in the `closeBundle` hook (Vite's Rollup pipeline can't produce MV3-compatible service workers or popup scripts directly). `manifest.json`, `picker.html`, and icons are copied as-is.
+**Input focus** — `ie` focuses an input and places cursor at start; `ia` at end; `ic` clears and focuses. These use hint overlays to select the target input/textarea.
+
+**Build** — Vite handles `content.ts` (IIFE, with all CSS inlined). `background.ts` and `picker.ts` are built separately via esbuild in the `closeBundle` hook (Vite's Rollup pipeline can't produce MV3-compatible service workers or popup scripts directly). `manifest.json`, `picker.html`, and icons are copied as-is. `xr` hotkey sends `reloadExtension` to the background, which calls `chrome.runtime.reload()` to reload the extension without opening `chrome://extensions`.
 
 ## Source files
 
@@ -92,7 +96,7 @@ Escape calls `unhoverLast()` which reverses both.
 | `background.ts` | Tab/download/navigation API calls (service worker) |
 | `picker.ts` + `picker.html` | Popup window for window-pick UI (`W` action) |
 | `hints.ts` | All hint modes + hover logic |
-| `tabswitcher.ts` | Tab/window picker overlays (`gt`, `W`) |
+| `tabswitcher.ts` | Tab/window picker overlays (`tg`, `tw`) |
 | `whichkey.ts` | Prefix key disambiguation panel |
 | `scroll.ts` | Physics scroll |
 | `timecode.ts` | YouTube timecode save/seek/export/import |
