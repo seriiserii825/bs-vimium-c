@@ -38,9 +38,10 @@ export function showHelp(mappings: Mapping[]): void {
   const body = document.createElement("div");
   body.id = "bs-vimium-help-body";
 
-  type Row = { el: HTMLElement; hotkey: string; desc: string };
+  type Row = { el: HTMLElement; groupHeader: HTMLElement; hotkey: string; desc: string };
   const rows: Row[] = [];
   let currentGroup = "";
+  let currentGroupHeader: HTMLElement | null = null;
 
   for (const { hotkey, description, group } of mappings) {
     if (group && group !== currentGroup) {
@@ -52,6 +53,7 @@ export function showHelp(mappings: Mapping[]): void {
       groupLabel.textContent = group;
       groupRow.appendChild(groupLabel);
       body.appendChild(groupRow);
+      currentGroupHeader = groupRow;
     }
 
     const row = document.createElement("div");
@@ -70,13 +72,19 @@ export function showHelp(mappings: Mapping[]): void {
     row.appendChild(keyCell);
     row.appendChild(descCell);
     body.appendChild(row);
-    rows.push({ el: row, hotkey: hotkey.toLowerCase(), desc: description.toLowerCase() });
+    rows.push({ el: row, groupHeader: currentGroupHeader!, hotkey: hotkey.toLowerCase(), desc: description.toLowerCase() });
   }
 
   search.addEventListener("input", () => {
     const q = search.value.toLowerCase().trim();
+    const visibleHeaders = new Set<HTMLElement>();
     for (const r of rows) {
-      r.el.style.display = !q || r.hotkey.includes(q) || r.desc.includes(q) ? "" : "none";
+      const show = !q || r.hotkey.includes(q) || r.desc.includes(q);
+      r.el.style.display = show ? "" : "none";
+      if (show) visibleHeaders.add(r.groupHeader);
+    }
+    for (const r of rows) {
+      r.groupHeader.style.display = !q || visibleHeaders.has(r.groupHeader) ? "" : "none";
     }
     body.style.columns = q ? "1" : "";
   });
