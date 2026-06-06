@@ -43,8 +43,8 @@ Hint modes (hotkeys are from `maps.csv` — check there for the authoritative li
 - `f` — follow link (click) in current tab
 - `F` — follow link in new tab
 - `c` — toggle checkbox / radio / select
-- `fm` — open multiple links in background tabs (Enter to finish)
-- `cm` — multi-click: click multiple elements then Enter
+- `oml` — open multiple links in background tabs (Enter to finish)
+- `C` — multi-click: click multiple elements then Enter
 - `yv` — copy element `innerText` to clipboard
 - `yl` — copy link `href` to clipboard
 - `yi` — copy input/textarea value (or placeholder if empty)
@@ -72,7 +72,7 @@ Escape calls `unhoverLast()` which reverses both.
 
 **Tab switcher** (`tabswitcher.ts`) — `tg` opens a visual overlay of all tabs in the current window, each labeled with a hint character. Typing a label activates that tab. `tw` (moveTabToWindow) opens a similar overlay for picking which window to move the current tab to — this uses `picker.ts` / `picker.html` rendered in a popup window via `chrome.windows.create`.
 
-**Timecode** (`timecode.ts`) — YouTube-specific. `mc` opens a prompt to seek to a `HH:MM:SS` timestamp. `ms` saves the current position with a name prompt. `me`/`mi` export/import timecodes as JSON. Entries are stored in `localStorage` under `bs-timecodes`, keyed by YouTube video ID, max 30 per video.
+**Timecode** (`timecode.ts`) — YouTube-specific. `vc` opens a prompt to seek to a `HH:MM:SS` timestamp. `vs` saves the current position with a name prompt. `ve`/`vi` export/import timecodes as JSON. Entries are stored in `localStorage` under `bs-timecodes`, keyed by YouTube video ID, max 30 per video. `startTimecodeWatcher()` runs a 500ms interval: when `video.currentTime` naturally reaches a saved timecode, the video pauses and a popup appears asking to Continue or Stay. Seeking to a timecode manually (via the list) pre-marks it in `firedSeconds` so the watcher doesn't fire. Seeking backwards more than 3 seconds re-arms timecodes that are now in the future. Timecode entries are deleted with `Delete` key only (not Backspace).
 
 **SEO tools** — `sh` (`seoinfo.ts`) shows a panel with meta title, description, og/twitter tags, and canonical URL. `st` (`seoheadings.ts`) shows the heading structure (h1–h3) as an outline panel. Both panels close on Escape or a second keypress.
 

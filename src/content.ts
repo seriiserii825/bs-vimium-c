@@ -17,7 +17,7 @@ import { showCookieConfirm, hideCookieConfirm, isCookieConfirmVisible } from "./
 import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { showSeoInfo, hideSeoInfo, isSeoInfoVisible } from "./seoinfo";
 import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seoheadings";
-import { showTimecode, hideTimecode, isTimecodeVisible, saveCurrentTimecode, exportTimecodes, importTimecodes } from "./timecode";
+import { showTimecode, hideTimecode, isTimecodeVisible, saveCurrentTimecode, exportTimecodes, importTimecodes, startTimecodeWatcher } from "./timecode";
 import { applyBestQuality } from "./videoquality";
 import { showToast } from "./toast";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
@@ -458,3 +458,5 @@ chrome.storage.local.get("reloadedToast", (res) => {
     showToast("Extension reloaded", "");
   }
 });
+
+startTimecodeWatcher();

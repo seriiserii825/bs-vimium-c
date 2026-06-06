@@ -8,10 +8,10 @@ G,scrollToBottom,Scroll to bottom of page,scroll
 H,historyBack,Go back in history,history
 L,historyForward,Go forward in history,history
 f,followLink,Follow link or button,click
-fm,openMultiLinks,Open multiple links,click
 F,followLinkNewTab,Follow link in new tab,click
+oml,openMultiLinks,Open multiple links,click
 c,followFormControl,Toggle checkbox / radio / select,click
-cm,followMultiClick,Click multiple elements then Enter,click
+C,followMultiClick,Click multiple elements then Enter,click
 A-h,hoverElement,Hover over element,click
 yv,yankText,Copy text of element,copy
 yl,yankLinkUrl,Copy link URL,copy
@@ -56,13 +56,13 @@ zw,zoomFitWindow,Reset zoom (fit to window),zoom
 zf,zoomFull,Zoom to 100%,zoom
 zi,zoomIn,Zoom in,zoom
 zo,zoomOut,Zoom out,zoom
-mc,seekTimecode,Go to video timecode (HH:MM:SS),timecode
-ms,saveTimecode,Save current video position as timecode,timecode
-me,exportTimecodes,Export all timecodes to JSON file,timecode
-mi,importTimecodes,Import timecodes from JSON file,timecode
 vu,speedUp,Speed up video (+0.25),video
 vd,speedDown,Speed down video (-0.25),video
 vq,videoQuality,Set video quality,video
 vf,videoFullscreen,Toggle video fullscreen,video
+vc,seekTimecode,Go to video timecode (HH:MM:SS),timecode
+vs,saveTimecode,Save current video position as timecode,timecode
+ve,exportTimecodes,Export all timecodes to JSON file,timecode
+vi,importTimecodes,Import timecodes from JSON file,timecode
 ?,showHelp,Show keyboard shortcuts,dev
 xr,reloadExtension,Reload extension,dev

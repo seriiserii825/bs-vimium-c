@@ -259,7 +259,7 @@ export function showTimecode(): void {
       item.addEventListener('keydown', (e) => {
         e.stopPropagation()
         if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
-        if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeItem(); return }
+        if (e.key === 'Delete') { e.preventDefault(); removeItem(); return }
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
           hideTimecode()
@@ -407,6 +407,12 @@ export function showTimecode(): void {
 }
 
 function seekToTime(seconds: number): void {
+  // Pre-mark so the watcher doesn't fire when playback lands on this timecode
+  const videoId = getVideoId()
+  if (videoId) {
+    lastWatchedVideoId = videoId
+    firedSeconds.add(seconds)
+  }
   const video = document.querySelector('video')
   if (video) { video.currentTime = seconds; video.play(); return }
   const url = new URL(window.location.href)
@@ -486,6 +492,113 @@ export function importTimecodes(): void {
   })
   input.click()
 }
+
+// --- Timecode watcher ---
+
+let watchInterval: ReturnType<typeof setInterval> | null = null
+let lastWatchedVideoId: string | null = null
+const firedSeconds = new Set<number>()
+let lastCurrentTime = 0
+let reachedPopup: HTMLElement | null = null
+
+export function startTimecodeWatcher(): void {
+  if (watchInterval !== null) return
+  watchInterval = setInterval(tickWatcher, 500)
+}
+
+function tickWatcher(): void {
+  const videoId = getVideoId()
+  if (!videoId) return
+  const video = document.querySelector('video')
+  if (!video || video.paused) return
+
+  const now = video.currentTime
+
+  if (videoId !== lastWatchedVideoId) {
+    lastWatchedVideoId = videoId
+    firedSeconds.clear()
+    lastCurrentTime = now
+  }
+
+  // Re-arm timecodes the user seeked back past
+  if (now < lastCurrentTime - 3) {
+    for (const s of firedSeconds) {
+      if (s >= now) firedSeconds.delete(s)
+    }
+  }
+  lastCurrentTime = now
+
+  const entries = loadEntries().filter(e => e.videoId === videoId)
+  for (const entry of entries) {
+    if (firedSeconds.has(entry.seconds)) continue
+    if (now >= entry.seconds && now < entry.seconds + 1) {
+      firedSeconds.add(entry.seconds)
+      video.pause()
+      showReachedPopup(entry, video)
+      break
+    }
+  }
+}
+
+function showReachedPopup(entry: TimecodeEntry, video: HTMLVideoElement): void {
+  reachedPopup?.remove()
+
+  const el = document.createElement('div')
+  el.id = 'bs-tcr'
+
+  const info = document.createElement('div')
+  info.id = 'bs-tcr-info'
+
+  const nameEl = document.createElement('span')
+  nameEl.id = 'bs-tcr-name'
+  nameEl.textContent = entry.name || formatTime(entry.seconds)
+
+  info.appendChild(nameEl)
+
+  if (entry.name) {
+    const timeEl = document.createElement('span')
+    timeEl.id = 'bs-tcr-time'
+    timeEl.textContent = formatTime(entry.seconds)
+    info.appendChild(timeEl)
+  }
+
+  const btns = document.createElement('div')
+  btns.id = 'bs-tcr-btns'
+
+  const continueBtn = document.createElement('button')
+  continueBtn.className = 'bs-tcr-btn bs-tcr-continue'
+  continueBtn.textContent = 'Continue ▶'
+
+  const stayBtn = document.createElement('button')
+  stayBtn.className = 'bs-tcr-btn bs-tcr-stay'
+  stayBtn.textContent = 'Stay'
+
+  btns.appendChild(continueBtn)
+  btns.appendChild(stayBtn)
+  el.appendChild(info)
+  el.appendChild(btns)
+  reachedPopup = el
+  document.documentElement.appendChild(el)
+
+  function dismiss(resume: boolean): void {
+    if (!reachedPopup) return
+    el.remove()
+    reachedPopup = null
+    document.removeEventListener('keydown', onKey, true)
+    if (resume) void video.play()
+  }
+
+  function onKey(e: KeyboardEvent): void {
+    if (e.key === 'Escape') { e.stopPropagation(); dismiss(false) }
+  }
+
+  continueBtn.addEventListener('click', () => dismiss(true))
+  stayBtn.addEventListener('click', () => dismiss(false))
+  document.addEventListener('keydown', onKey, true)
+  requestAnimationFrame(() => continueBtn.focus())
+}
+
+// ---
 
 function showToastLocal(message: string, prefix: string): void {
   const existing = document.getElementById('bs-vimium-toast')
