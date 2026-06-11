@@ -550,6 +550,7 @@ export function saveCurrentTimecode(): void {
 export function hideTimecode(): void {
   backdrop?.remove()
   backdrop = null
+  document.querySelector('video')?.focus()
 }
 
 export function isTimecodeVisible(): boolean {
