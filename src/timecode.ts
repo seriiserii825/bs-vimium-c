@@ -167,9 +167,38 @@ export function showTimecode(): void {
 
   // History items
   const historyItems: HTMLElement[] = []
+  let searchInput: HTMLInputElement | null = null
   if (history.length > 0) {
     const histList = document.createElement('div')
     histList.id = 'bs-timecode-history'
+
+    const searchRow = document.createElement('div')
+    searchRow.id = 'bs-timecode-search-row'
+
+    const search = document.createElement('input')
+    search.type = 'text'
+    search.id = 'bs-timecode-search'
+    search.placeholder = 'Filter…'
+    search.spellcheck = false
+    searchInput = search
+
+    const playBtn = document.createElement('button')
+    playBtn.id = 'bs-timecode-play'
+    playBtn.textContent = '▶'
+    playBtn.title = 'Play first match'
+    playBtn.type = 'button'
+    playBtn.tabIndex = 0
+
+    const editBtn = document.createElement('button')
+    editBtn.id = 'bs-timecode-edit'
+    editBtn.textContent = '✎'
+    editBtn.title = 'Rename first match'
+    editBtn.type = 'button'
+    editBtn.tabIndex = 0
+
+    searchRow.appendChild(search)
+    searchRow.appendChild(playBtn)
+    searchRow.appendChild(editBtn)
 
     ;[...history].sort((a, b) => a.seconds - b.seconds).forEach((entry) => {
       const item = document.createElement('div')
@@ -195,7 +224,7 @@ export function showTimecode(): void {
       deleteBtn.className = 'bs-timecode-delete'
       deleteBtn.textContent = '×'
       deleteBtn.title = 'Delete'
-      deleteBtn.tabIndex = -1
+      deleteBtn.tabIndex = 0
       deleteBtn.type = 'button'
 
       item.appendChild(radio)
@@ -238,16 +267,12 @@ export function showTimecode(): void {
         }
         if (e.key === 'Tab' && !e.shiftKey) {
           e.preventDefault(); saveName()
-          const next = historyItems[historyItems.indexOf(item) + 1]
-          if (next) next.querySelector<HTMLInputElement>('.bs-timecode-name-input')?.focus()
-          else hh.focus()
+          deleteBtn.focus()
           return
         }
         if (e.key === 'Tab' && e.shiftKey) {
           e.preventDefault(); saveName()
-          const prev = historyItems[historyItems.indexOf(item) - 1]
-          if (prev) prev.querySelector<HTMLInputElement>('.bs-timecode-name-input')?.focus()
-          else { ss.focus(); ss.select() }
+          item.focus()
           return
         }
       })
@@ -269,28 +294,26 @@ export function showTimecode(): void {
         }
         if (e.key === 'Tab' && !e.shiftKey) {
           e.preventDefault()
-          const next = historyItems[historyItems.indexOf(item) + 1]
-          if (next) next.focus()
-          else hh.focus()
+          nameInput.focus()
           return
         }
         if (e.key === 'Tab' && e.shiftKey) {
           e.preventDefault()
-          const prev = historyItems[historyItems.indexOf(item) - 1]
-          if (prev) prev.focus()
-          else { ss.focus(); ss.select() }
+          const prev = prevVisible(historyItems.indexOf(item) - 1)
+          if (prev) prev.querySelector<HTMLButtonElement>('.bs-timecode-delete')?.focus()
+          else editBtn.focus()
           return
         }
         if (e.key === 'ArrowDown') {
           e.preventDefault()
-          historyItems[historyItems.indexOf(item) + 1]?.focus()
+          nextVisible(historyItems.indexOf(item) + 1)?.focus()
           return
         }
         if (e.key === 'ArrowUp') {
           e.preventDefault()
-          const i = historyItems.indexOf(item)
-          if (i === 0) { if (!row.hidden) { ss.focus(); ss.select() } else toggleBtn.focus() }
-          else historyItems[i - 1].focus()
+          const prev = prevVisible(historyItems.indexOf(item) - 1)
+          if (prev) prev.focus()
+          else search.focus()
           return
         }
         if (e.key === 'ArrowRight') {
@@ -306,6 +329,18 @@ export function showTimecode(): void {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); removeItem(); return }
         if (e.key === 'Escape') { item.focus(); return }
         if (e.key === 'ArrowLeft') { e.preventDefault(); nameInput.focus(); return }
+        if (e.key === 'Tab' && !e.shiftKey) {
+          e.preventDefault()
+          const next = nextVisible(historyItems.indexOf(item) + 1)
+          if (next) next.focus()
+          else hh.focus()
+          return
+        }
+        if (e.key === 'Tab' && e.shiftKey) {
+          e.preventDefault()
+          nameInput.focus()
+          return
+        }
       })
 
       item.addEventListener('focus', () => {
@@ -325,6 +360,83 @@ export function showTimecode(): void {
       deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); removeItem() })
     })
 
+    function firstVisible(): HTMLElement | undefined {
+      return historyItems.find(i => i.style.display !== 'none')
+    }
+
+    function nextVisible(from: number): HTMLElement | undefined {
+      let i = from
+      while (historyItems[i] && historyItems[i].style.display === 'none') i++
+      return historyItems[i]
+    }
+
+    function prevVisible(from: number): HTMLElement | undefined {
+      let i = from
+      while (i >= 0 && historyItems[i].style.display === 'none') i--
+      return i >= 0 ? historyItems[i] : undefined
+    }
+
+    function playFirstMatch(): void {
+      const item = firstVisible()
+      if (!item) return
+      const seconds = Number(item.dataset.seconds)
+      hideTimecode()
+      seekToTime(seconds)
+    }
+
+    function editFirstMatch(): void {
+      const nameInput = firstVisible()?.querySelector<HTMLInputElement>('.bs-timecode-name-input')
+      nameInput?.focus()
+      nameInput?.select()
+    }
+
+    function applyFilter(): void {
+      const q = search.value.trim().toLowerCase()
+      historyItems.forEach((item) => {
+        const name = item.querySelector<HTMLInputElement>('.bs-timecode-name-input')?.value.toLowerCase() ?? ''
+        const time = item.querySelector<HTMLElement>('.bs-timecode-time')?.textContent?.toLowerCase() ?? ''
+        item.style.display = q && !name.includes(q) && !time.includes(q) ? 'none' : ''
+      })
+    }
+
+    search.addEventListener('input', applyFilter)
+    search.addEventListener('keydown', (e) => {
+      e.stopPropagation()
+      if (e.key === 'Escape') {
+        if (search.value) { search.value = ''; applyFilter() } else hideTimecode()
+        return
+      }
+      if (e.key === 'Enter') { e.preventDefault(); playFirstMatch(); return }
+      if (e.key === 'ArrowDown') { e.preventDefault(); firstVisible()?.focus(); return }
+      if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); playBtn.focus(); return }
+      if (e.key === 'Tab' && e.shiftKey) {
+        e.preventDefault()
+        if (!row.hidden) { ss.focus(); ss.select() } else toggleBtn.focus()
+        return
+      }
+    })
+
+    playBtn.addEventListener('click', () => playFirstMatch())
+    playBtn.addEventListener('keydown', (e) => {
+      e.stopPropagation()
+      if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playFirstMatch(); return }
+      if (e.key === 'Escape') { search.focus(); return }
+      if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); editBtn.focus(); return }
+      if (e.key === 'Tab' && e.shiftKey) { e.preventDefault(); search.focus(); return }
+    })
+
+    editBtn.addEventListener('click', () => editFirstMatch())
+    editBtn.addEventListener('keydown', (e) => {
+      e.stopPropagation()
+      if (e.key === 'q' || e.key === 'Q') { hideTimecode(); return }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); editFirstMatch(); return }
+      if (e.key === 'Escape') { search.focus(); return }
+      if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); (firstVisible() ?? historyItems[0])?.focus(); return }
+      if (e.key === 'Tab' && e.shiftKey) { e.preventDefault(); playBtn.focus(); return }
+    })
+
+    panel.appendChild(searchRow)
     panel.appendChild(histList)
   }
 
@@ -352,6 +464,7 @@ export function showTimecode(): void {
       if (e.key === 'Tab' && !e.shiftKey) {
         e.preventDefault()
         if (inputs[idx + 1]) { inputs[idx + 1].focus(); inputs[idx + 1].select() }
+        else if (searchInput) searchInput.focus()
         else if (historyItems[0]) historyItems[0].focus()
         return
       }
@@ -395,7 +508,8 @@ export function showTimecode(): void {
 
   document.documentElement.appendChild(backdrop)
   requestAnimationFrame(() => {
-    if (historyItems[0]) historyItems[0].focus()
+    if (searchInput) searchInput.focus()
+    else if (historyItems[0]) historyItems[0].focus()
     else toggleBtn.focus()
   })
 
