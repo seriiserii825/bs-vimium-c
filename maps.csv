@@ -50,7 +50,7 @@ oi,openIncognito,Open current tab in in,opencognito window
 sh,showSeoInfo,Show SEO meta info,seo
 st,showSeoHeadings,Show heading structure (h1/h2/h3),seo
 ie,inputEditStart,Focus input and place cursor at start,input
-ia,inputEdit,Focus input and place cursor at end,input
+ii,inputEdit,Focus input and place cursor at end,input
 ic,inputClearEdit,Clear and focus input or textarea,input
 zw,zoomFitWindow,Reset zoom (fit to window),zoom
 zf,zoomFull,Zoom to 100%,zoom
