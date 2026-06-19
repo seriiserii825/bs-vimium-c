@@ -329,6 +329,25 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
     return 'done'
   }
 
+  // Enter завершает open-multi-links и открывает все накопленные ссылки в новых вкладках
+  if (key === 'Enter' && session.mode === 'om') {
+    const entries = session.collectedEntries
+    if (entries && entries.length > 0) {
+      for (const entry of entries) {
+        const anchor = entry.el instanceof HTMLAnchorElement ? entry.el : entry.el.closest('a[href]')
+        if (anchor instanceof HTMLAnchorElement && anchor.href) {
+          chrome.runtime.sendMessage({ type: 'openTab', url: anchor.href })
+        } else {
+          const clickEl = entry.clickTarget ?? entry.el
+          clickEl.focus()
+          clickEl.click()
+        }
+      }
+      showToast(`Opened ${entries.length} links`)
+    }
+    return 'done'
+  }
+
   // Enter завершает multi-follow и кликает все накопленные элементы
   if (key === 'Enter' && session.mode === 'ymf') {
     const entries = session.collectedEntries
@@ -378,12 +397,8 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
       return 'continue'
     }
     if (session.mode === 'om') {
-      const el = match.el
-      if (el instanceof HTMLAnchorElement && el.href) {
-        chrome.runtime.sendMessage({ type: 'openTab', url: el.href })
-      } else {
-        el.click()
-      }
+      session.collectedEntries = session.collectedEntries ?? []
+      session.collectedEntries.push(match)
       match.node.classList.add('selected')
       session.typed = ''
       for (const entry of session.entries) entry.node.classList.remove('dim')
