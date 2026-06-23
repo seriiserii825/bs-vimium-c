@@ -80,7 +80,7 @@ Escape calls `unhoverLast()` which reverses both.
 
 **Image info** (`imageinfo.ts`) — `Ii` hint mode shows a popup with image dimensions, file size, and MIME type fetched via a `HEAD` request.
 
-**Video quality / fullscreen** (`videoquality.ts`) — `vq` shows a quality picker for the current `<video>` element if it exposes quality levels. `vf` toggles fullscreen (clicks `.ytp-fullscreen-button`, YouTube-specific). `vu`/`vd` adjust playback rate by ±0.25; current rate shown via a toast notification.
+**Video quality / fullscreen** (`videoquality.ts`) — `vq` shows a quality picker for the current `<video>` element if it exposes quality levels. `vf` toggles fullscreen (clicks `.ytp-fullscreen-button`, YouTube-specific). `vu`/`vd` adjust playback rate by ±0.25; current rate shown via a toast notification. `vo` opens the current `<video>` element's `currentSrc`/`src` in a new tab (background `navigateTo`), mirroring `Io` for images; shows a toast instead if the source is a `blob:` URL (e.g. YouTube's MSE-backed video has no directly fetchable URL).
 
 **Zoom** — `zw` resets zoom to fit the page width; `zf` resets to 100%; `zi`/`zo` zoom in/out. All send messages to background which calls `chrome.tabs.setZoom`.
 

@@ -94,6 +94,7 @@ type Action =
   | "speedDown"
   | "videoQuality"
   | "videoFullscreen"
+  | "openVideoNewTab"
   | "reloadExtension";
 
 const actions: Record<Action, () => void> = {
@@ -241,6 +242,12 @@ const actions: Record<Action, () => void> = {
   videoFullscreen: () => {
     const btn = document.querySelector('.ytp-fullscreen-button') as HTMLElement | null
     btn?.click()
+  },
+  openVideoNewTab: () => {
+    const video = document.querySelector('video')
+    const src = video?.currentSrc || video?.src
+    if (!src || src.startsWith('blob:')) { showToast('No direct video source'); return }
+    chrome.runtime.sendMessage({ type: 'navigateTo', url: src })
   },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
