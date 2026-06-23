@@ -243,12 +243,7 @@ const actions: Record<Action, () => void> = {
     const btn = document.querySelector('.ytp-fullscreen-button') as HTMLElement | null
     btn?.click()
   },
-  openVideoNewTab: () => {
-    const video = document.querySelector('video')
-    const src = video?.currentSrc || video?.src
-    if (!src || src.startsWith('blob:')) { showToast('No direct video source'); return }
-    chrome.runtime.sendMessage({ type: 'navigateTo', url: src })
-  },
+  openVideoNewTab: () => { session = beginHints("oV"); },
   deleteCookiesRefresh: () => {
     chrome.runtime.sendMessage({ type: "getCookies", url: window.location.href }, (res) => {
       showCookieConfirm(window.location.href, res?.cookies ?? []);

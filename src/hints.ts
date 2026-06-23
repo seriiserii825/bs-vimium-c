@@ -87,7 +87,7 @@ export function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is' | 'c'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'oV' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is' | 'c'
 
 export interface HintEntry {
   el: HTMLElement
@@ -283,6 +283,7 @@ export function beginHints(mode: HintMode): HintSession | null {
       )).filter(isVisible)
     : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(el => isVisible(el) && !el.parentElement?.closest('svg'))
     : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
+    : mode === 'oV' ? Array.from(document.querySelectorAll<HTMLElement>('video')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : (mode === 'ctc' || mode === 'ctmc') ? getTableColumns()
     : mode === 'ymf' ? getCheckboxesAndRadios()
@@ -463,6 +464,11 @@ function activate(entry: HintEntry, mode: HintMode): void {
   } else if (mode === 'oI') {
     const src = (entry.el as HTMLImageElement).src
     if (src) chrome.runtime.sendMessage({ type: 'navigateTo', url: src })
+  } else if (mode === 'oV') {
+    const video = entry.el as HTMLVideoElement
+    const src = video.currentSrc || video.src
+    if (!src || src.startsWith('blob:')) { showToast('No direct video source') }
+    else chrome.runtime.sendMessage({ type: 'navigateTo', url: src })
   } else if (mode === 'ci') {
     const src = (entry.el as HTMLImageElement).src
     if (src) copyImageToClipboard(src)
