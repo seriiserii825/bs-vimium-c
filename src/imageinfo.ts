@@ -2,11 +2,17 @@ import { writeText } from './clipboard'
 
 let panel: HTMLElement | null = null
 
+export function getImageNames(img: HTMLImageElement): { src: string; filename: string; basename: string } {
+  const src = img.currentSrc || img.src
+  const filename = decodeURIComponent(src.split('/').pop()?.split('?')[0] ?? 'image')
+  const basename = filename.includes('.') ? filename.slice(0, filename.lastIndexOf('.')) : filename
+  return { src, filename, basename }
+}
+
 export function showImageInfo(img: HTMLImageElement): void {
   hideImageInfo()
 
-  const src = img.currentSrc || img.src
-  const filename = decodeURIComponent(src.split('/').pop()?.split('?')[0] ?? 'image')
+  const { src, filename, basename } = getImageNames(img)
   const width = img.naturalWidth || img.width
   const height = img.naturalHeight || img.height
   const rect = img.getBoundingClientRect()
@@ -40,8 +46,6 @@ export function showImageInfo(img: HTMLImageElement): void {
   // Footer
   const footer = document.createElement('div')
   footer.id = 'bs-imginfo-footer'
-
-  const basename = filename.includes('.') ? filename.slice(0, filename.lastIndexOf('.')) : filename
 
   footer.appendChild(makeBtn('Copy path', () => writeText(src)))
   footer.appendChild(makeBtn('Copy name', () => writeText(filename)))

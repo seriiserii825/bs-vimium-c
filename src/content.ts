@@ -76,6 +76,9 @@ type Action =
   | "moveTabToWindow"
   | "deleteCookiesRefresh"
   | "imageInfo"
+  | "copyImagePath"
+  | "copyImageName"
+  | "copyImageBasename"
   | "copyTableColumn"
   | "copyTableMultiColumn"
   | "showSeoInfo"
@@ -229,6 +232,15 @@ const actions: Record<Action, () => void> = {
   },
   imageInfo: () => {
     session = beginHints("ii");
+  },
+  copyImagePath: () => {
+    session = beginHints("ip");
+  },
+  copyImageName: () => {
+    session = beginHints("in");
+  },
+  copyImageBasename: () => {
+    session = beginHints("ib");
   },
   copyTableColumn: () => { session = beginHints("ctc"); },
   copyTableMultiColumn: () => { session = beginHints("ctmc"); },

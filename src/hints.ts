@@ -1,5 +1,5 @@
 import { showToast } from './toast'
-import { showImageInfo } from './imageinfo'
+import { showImageInfo, getImageNames } from './imageinfo'
 import { writeText } from './clipboard'
 
 // Home-row first, then nearby keys for comfortable typing
@@ -87,7 +87,7 @@ export function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'oV' | 'ii' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is' | 'c'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'oV' | 'ii' | 'ip' | 'in' | 'ib' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is' | 'c'
 
 export interface HintEntry {
   el: HTMLElement
@@ -282,7 +282,7 @@ export function beginHints(mode: HintMode): HintSession | null {
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
     : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(el => isVisible(el) && !el.parentElement?.closest('svg'))
-    : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
+    : (mode === 'di' || mode === 'ci' || mode === 'oI' || mode === 'ii' || mode === 'ip' || mode === 'in' || mode === 'ib') ? Array.from(document.querySelectorAll<HTMLElement>('img[src]')).filter(isVisible)
     : mode === 'oV' ? Array.from(document.querySelectorAll<HTMLElement>('video')).filter(isVisible)
     : mode === 'h' ? getHoverable()
     : (mode === 'ctc' || mode === 'ctmc') ? getTableColumns()
@@ -458,6 +458,18 @@ function activate(entry: HintEntry, mode: HintMode): void {
     showToast(`Copied ${text.split('\n').length} cells`)
   } else if (mode === 'ii') {
     showImageInfo(entry.el as HTMLImageElement)
+  } else if (mode === 'ip') {
+    const { src } = getImageNames(entry.el as HTMLImageElement)
+    writeText(src)
+    showToast(src)
+  } else if (mode === 'in') {
+    const { filename } = getImageNames(entry.el as HTMLImageElement)
+    writeText(filename)
+    showToast(filename)
+  } else if (mode === 'ib') {
+    const { basename } = getImageNames(entry.el as HTMLImageElement)
+    writeText(basename)
+    showToast(basename)
   } else if (mode === 'di') {
     const src = (entry.el as HTMLImageElement).src
     if (src) chrome.runtime.sendMessage({ type: 'downloadImage', url: src })
