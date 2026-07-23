@@ -20,6 +20,7 @@ import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seohea
 import { showTimecode, hideTimecode, isTimecodeVisible, saveCurrentTimecode, exportTimecodes, importTimecodes, startTimecodeWatcher } from "./timecode";
 import { applyBestQuality } from "./videoquality";
 import { showToast } from "./toast";
+import { writeText } from "./clipboard";
 import { startScroll, stopScroll, scrollToTop, scrollToBottom } from "./scroll";
 import mappings from "../maps.csv";
 
@@ -41,6 +42,8 @@ type Action =
   | "goExtensions"
   | "goExtensionShortcuts"
   | "goDownloads"
+  | "goWpAdmin"
+  | "yankPageId"
   | "historyBack"
   | "historyForward"
   | "prevTab"
@@ -96,6 +99,24 @@ type Action =
   | "videoFullscreen"
   | "openVideoNewTab"
   | "reloadExtension";
+
+function extractWpPostId(): string | null {
+  const bodyClass = document.body.className || "";
+
+  const postIdMatch = bodyClass.match(/\bpostid-(\d+)\b/);
+  if (postIdMatch) return postIdMatch[1];
+
+  const pageIdMatch = bodyClass.match(/\bpage-id-(\d+)\b/);
+  if (pageIdMatch) return pageIdMatch[1];
+
+  const editLink = document.querySelector<HTMLAnchorElement>("#wp-admin-bar-edit a");
+  if (editLink) {
+    const hrefMatch = editLink.href.match(/[?&]post=(\d+)/);
+    if (hrefMatch) return hrefMatch[1];
+  }
+
+  return null;
+}
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
@@ -177,6 +198,17 @@ const actions: Record<Action, () => void> = {
   goExtensions:         () => { chrome.runtime.sendMessage({ type: "navigateTo", url: "chrome://extensions/" }) },
   goExtensionShortcuts: () => { chrome.runtime.sendMessage({ type: "navigateTo", url: "chrome://extensions/shortcuts" }) },
   goDownloads:          () => { chrome.runtime.sendMessage({ type: "navigateTo", url: "chrome://downloads/" }) },
+  goWpAdmin: () => {
+    const postId = extractWpPostId();
+    if (!postId) { showToast("WP post id not found", ""); return; }
+    window.location.href = `${window.location.origin}/wp-admin/post.php?post=${postId}&action=edit`;
+  },
+  yankPageId: () => {
+    const postId = extractWpPostId();
+    if (!postId) { showToast("WP post id not found", ""); return; }
+    writeText(postId);
+    showToast(postId);
+  },
   prevTab:      () => { chrome.runtime.sendMessage({ type: "prevTab" }) },
   nextTab:      () => { chrome.runtime.sendMessage({ type: "nextTab" }) },
   moveTabRight: () => { chrome.runtime.sendMessage({ type: "moveTabRight" }) },
