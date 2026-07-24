@@ -141,6 +141,27 @@ function extractHoverRules(ruleList: CSSRuleList): string[] {
   return result
 }
 
+// Некоторые элементы раскрывают hover-эффект у ДРУГОГО элемента (например,
+// ".row:hover .actions { display: block }") и сами не имеют cursor:pointer.
+// Извлекаем компонент селектора непосредственно перед ":hover", чтобы находить
+// такие элементы-триггеры и предлагать их как цели для наведения.
+function extractHoverTriggerSelectors(ruleList: CSSRuleList): string[] {
+  const result: string[] = []
+  for (const rule of Array.from(ruleList)) {
+    if (rule instanceof CSSStyleRule) {
+      for (const part of rule.selectorText.split(',')) {
+        const matches = part.match(/[^\s>+~]+:hover\b/g)
+        if (matches) {
+          for (const m of matches) result.push(m.replace(/:hover\b/, ''))
+        }
+      }
+    } else if (rule instanceof CSSMediaRule) {
+      result.push(...extractHoverTriggerSelectors(rule.cssRules))
+    }
+  }
+  return result
+}
+
 function activateCSSHover(el: HTMLElement): void {
   const path = ancestorPath(el)
   for (const a of path) a.dataset.bsHover = '1'
@@ -203,11 +224,30 @@ function getColumnText(cell: HTMLTableCellElement): string {
 }
 
 function getHoverable(): HTMLElement[] {
-  return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {
-    if (!isVisible(el)) return false
-    if (el.closest('svg')) return false
-    return window.getComputedStyle(el).cursor === 'pointer'
-  })
+  const isCandidate = (el: HTMLElement) => isVisible(el) && !el.closest('svg')
+
+  const result = Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el =>
+    isCandidate(el) && window.getComputedStyle(el).cursor === 'pointer'
+  )
+  const added = new Set<HTMLElement>(result)
+
+  const triggerSelectors = new Set<string>()
+  for (const sheet of Array.from(document.styleSheets)) {
+    try {
+      for (const sel of extractHoverTriggerSelectors(sheet.cssRules)) triggerSelectors.add(sel)
+    } catch { /* cross-origin */ }
+  }
+
+  for (const sel of triggerSelectors) {
+    let matched: HTMLElement[]
+    try { matched = Array.from(document.querySelectorAll<HTMLElement>(sel)) } catch { continue }
+    for (const el of matched) {
+      if (added.has(el) || !isCandidate(el)) continue
+      added.add(el)
+      result.push(el)
+    }
+  }
+  return result
 }
 
 function getCheckboxesAndRadios(): Clickable[] {
