@@ -52,7 +52,7 @@ Hint modes (hotkeys are from `maps.csv` — check there for the authoritative li
 - `Tc` / `Tmc` — copy table column / multiple table columns
 - `A-h` — hover element: activates CSS `:hover` via stylesheet rewriting + dispatches JS mouse events up ancestor chain
 - `Id` — download image via `chrome.downloads`
-- `Ic` — copy image to clipboard as PNG blob (canvas approach for cross-origin; requires HTTPS)
+- `Ic` — copy image to clipboard as PNG blob (canvas approach for cross-origin, when `navigator.clipboard.write` is available); falls back to `execCommand('copy')` via a `Range` selection on the `<img>` element on HTTP pages or when the canvas/CORS path fails
 - `Io` — open image src in new tab
 - `Sc` — copy SVG code to clipboard; only top-level `<svg>` elements get hints (nested SVGs excluded)
 - `Ii` — show image info popup (dimensions, file size, type)

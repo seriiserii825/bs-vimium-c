@@ -427,14 +427,31 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
   return visible > 0 ? 'continue' : 'cancel'
 }
 
-async function copyImageToClipboard(src: string): Promise<void> {
+function copyImageViaExecCommand(imgEl: HTMLImageElement): boolean {
+  const selection = window.getSelection()
+  if (!selection) return false
+  const range = document.createRange()
+  range.selectNode(imgEl)
+  selection.removeAllRanges()
+  selection.addRange(range)
+  let ok = false
+  try { ok = document.execCommand('copy') } catch { ok = false }
+  selection.removeAllRanges()
+  return ok
+}
+
+async function copyImageToClipboard(imgEl: HTMLImageElement): Promise<void> {
+  if (!navigator.clipboard?.write) {
+    showToast(copyImageViaExecCommand(imgEl) ? 'Image copied' : 'Copy failed')
+    return
+  }
   try {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     await new Promise<void>((resolve, reject) => {
       img.onload = () => resolve()
       img.onerror = () => reject()
-      img.src = src
+      img.src = imgEl.src
     })
     const canvas = document.createElement('canvas')
     canvas.width = img.naturalWidth
@@ -443,11 +460,10 @@ async function copyImageToClipboard(src: string): Promise<void> {
     const blob = await new Promise<Blob>((resolve, reject) =>
       canvas.toBlob(b => b ? resolve(b) : reject(), 'image/png')
     )
-    if (!navigator.clipboard?.write) { showToast('Copy failed (HTTPS required)'); return }
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
     showToast('Image copied')
   } catch {
-    showToast('Copy failed (CORS)')
+    showToast(copyImageViaExecCommand(imgEl) ? 'Image copied' : 'Copy failed (CORS)')
   }
 }
 
@@ -482,8 +498,8 @@ function activate(entry: HintEntry, mode: HintMode): void {
     if (!src || src.startsWith('blob:')) { showToast('No direct video source') }
     else chrome.runtime.sendMessage({ type: 'navigateTo', url: src })
   } else if (mode === 'ci') {
-    const src = (entry.el as HTMLImageElement).src
-    if (src) copyImageToClipboard(src)
+    const el = entry.el as HTMLImageElement
+    if (el.src) copyImageToClipboard(el)
   } else if (mode === 'cs') {
     const svg = entry.el as unknown as SVGElement
     const code = new XMLSerializer().serializeToString(svg)
