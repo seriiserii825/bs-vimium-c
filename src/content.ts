@@ -103,7 +103,7 @@ type Action =
   | "openVideoNewTab"
   | "reloadExtension";
 
-function extractWpPostId(): string | null {
+function extractPostIdFromBodyClass(): string | null {
   const bodyClass = document.body.className || "";
 
   const postIdMatch = bodyClass.match(/\bpostid-(\d+)\b/);
@@ -119,6 +119,16 @@ function extractWpPostId(): string | null {
   }
 
   return null;
+}
+
+function extractPostIdFromUrl(): string | null {
+  const urlMatch = window.location.href.match(/[?&]post=(\d+)\b/);
+  if (urlMatch) return urlMatch[1];
+  return null;
+}
+
+function extractWpPostId(): string | null {
+  return extractPostIdFromBodyClass() ?? extractPostIdFromUrl();
 }
 
 const actions: Record<Action, () => void> = {
@@ -207,10 +217,13 @@ const actions: Record<Action, () => void> = {
     window.location.href = `${window.location.origin}/wp-admin/post.php?post=${postId}&action=edit`;
   },
   yankPageId: () => {
-    const postId = extractWpPostId();
-    if (!postId) { showToast("WP post id not found", ""); return; }
-    writeText(postId);
-    showToast(postId);
+    const bodyId = extractPostIdFromBodyClass();
+    if (bodyId) { writeText(bodyId); showToast(bodyId); return; }
+
+    const urlId = extractPostIdFromUrl();
+    if (urlId) { writeText(urlId); showToast(urlId); return; }
+
+    showToast("Not found in body class; not found in URL", "");
   },
   prevTab:      () => { chrome.runtime.sendMessage({ type: "prevTab" }) },
   nextTab:      () => { chrome.runtime.sendMessage({ type: "nextTab" }) },
