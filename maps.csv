@@ -17,6 +17,7 @@ yv,yankText,Copy text of element,copy
 yl,yankLinkUrl,Copy link URL,copy
 yi,yankInputText,Copy text from input,copy
 ymv,yankMultiText,Copy multiple elements,copy
+ymi,yankMultiInputText,Copy multiple input texts,copy
 yp,yankPageId,Copy WordPress page/post ID,copy
 Tc,copyTableColumn,Copy table column,copy
 Tmc,copyTableMultiColumn,Copy multiple table columns,copy

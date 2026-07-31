@@ -62,6 +62,7 @@ type Action =
   | "yankLinkUrl"
   | "yankInputText"
   | "yankMultiText"
+  | "yankMultiInputText"
   | "openMultiLinks"
   | "followMultiClick"
   | "hoverElement"
@@ -152,6 +153,9 @@ const actions: Record<Action, () => void> = {
   },
   yankMultiText: () => {
     session = beginHints("ym");
+  },
+  yankMultiInputText: () => {
+    session = beginHints("ymi");
   },
   openMultiLinks: () => {
     session = beginHints("om");

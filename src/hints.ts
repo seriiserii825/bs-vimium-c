@@ -3,7 +3,7 @@ import { showImageInfo, getImageNames } from './imageinfo'
 import { writeText } from './clipboard'
 
 // Home-row first, then nearby keys for comfortable typing
-const CHARS = 'sadfjklewcpghnrtuoibvyqxz'
+const CHARS = 'sadfjklewcpghnrtuoibvyxz'
 
 function getCopyable(): HTMLElement[] {
   return Array.from(document.querySelectorAll<HTMLElement>('*')).filter(el => {
@@ -87,7 +87,7 @@ export function generateLabels(n: number): string[] {
   return labels
 }
 
-export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'oV' | 'ii' | 'ip' | 'in' | 'ib' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is' | 'c'
+export type HintMode = 'f' | 'F' | 'y' | 'yl' | 'yi' | 'ym' | 'ymi' | 'om' | 'ymf' | 'h' | 'di' | 'ci' | 'cs' | 'oI' | 'oV' | 'ii' | 'ip' | 'in' | 'ib' | 'ctc' | 'ctmc' | 'ie' | 'ic' | 'is' | 'c'
 
 export interface HintEntry {
   el: HTMLElement
@@ -318,7 +318,7 @@ export function beginHints(mode: HintMode): HintSession | null {
   const rawElements: HTMLElement[] | Clickable[] =
     (mode === 'y' || mode === 'ym') ? getCopyable()
     : mode === 'yl' ? Array.from(document.querySelectorAll<HTMLElement>('a[href]')).filter(isVisible)
-    : (mode === 'yi' || mode === 'ie' || mode === 'ic' || mode === 'is') ? Array.from(document.querySelectorAll<HTMLElement>(
+    : (mode === 'yi' || mode === 'ymi' || mode === 'ie' || mode === 'ic' || mode === 'is') ? Array.from(document.querySelectorAll<HTMLElement>(
         'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]), textarea:not([disabled])'
       )).filter(isVisible)
     : mode === 'cs' ? Array.from(document.querySelectorAll<HTMLElement>('svg')).filter(el => isVisible(el) && !el.parentElement?.closest('svg'))
@@ -361,7 +361,7 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
   if (key === 'Escape') return 'cancel'
 
   // Enter завершает multi-yank и копирует накопленный текст
-  if (key === 'Enter' && (session.mode === 'ym' || session.mode === 'ctmc')) {
+  if (key === 'Enter' && (session.mode === 'ym' || session.mode === 'ymi' || session.mode === 'ctmc')) {
     const collected = session.collected
     if (collected && collected.length > 0) {
       writeText(collected.join('\n'))
@@ -417,6 +417,18 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
   if (match) {
     if (session.mode === 'ym') {
       const text = match.el.innerText?.trim() || ''
+      if (text) {
+        session.collected = session.collected ?? []
+        session.collected.push(text)
+        match.node.classList.add('selected')
+      }
+      session.typed = ''
+      for (const entry of session.entries) entry.node.classList.remove('dim')
+      return 'continue'
+    }
+    if (session.mode === 'ymi') {
+      const el = match.el as HTMLInputElement | HTMLTextAreaElement
+      const text = el.value.trim() || (el as HTMLInputElement).placeholder?.trim() || ''
       if (text) {
         session.collected = session.collected ?? []
         session.collected.push(text)
