@@ -1,0 +1,85 @@
+#bs-hist-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2147483646;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18vh;
+}
+
+#bs-hist-panel {
+  background: #1e1e2e;
+  border: 1px solid #45475a;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  width: 640px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#bs-hist-input {
+  display: block;
+  width: 100%;
+  background: #181825;
+  border: none;
+  border-bottom: 1px solid #313244;
+  color: #cdd6f4;
+  font-size: 17px;
+  font-family: monospace;
+  padding: 16px 18px;
+  outline: none;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+#bs-hist-list {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+#bs-hist-empty {
+  padding: 16px 18px;
+  font-size: 12px;
+  font-family: sans-serif;
+  color: #6c7086;
+}
+
+.bs-hist-row {
+  padding: 8px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid #313244;
+}
+
+.bs-hist-row:last-child {
+  border-bottom: none;
+}
+
+.bs-hist-row.bs-hist-selected {
+  background: #313244;
+}
+
+.bs-hist-title {
+  font: 13px/1.3 sans-serif;
+  color: #cdd6f4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bs-hist-url {
+  font: 11px/1.3 monospace;
+  color: #6c7086;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.bs-hist-row.bs-hist-selected .bs-hist-url {
+  color: #a6adc8;
+}

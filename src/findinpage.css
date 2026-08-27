@@ -1,0 +1,48 @@
+#bs-find-bar {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1e1e2e;
+  border: 1px solid #45475a;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  padding: 8px 12px;
+}
+
+#bs-find-input {
+  background: #181825;
+  border: 1px solid #313244;
+  border-radius: 5px;
+  color: #cdd6f4;
+  font-size: 13px;
+  font-family: monospace;
+  outline: none;
+  padding: 5px 10px;
+  width: 220px;
+}
+
+#bs-find-input:focus {
+  border-color: #cba6f7;
+}
+
+#bs-find-counter {
+  font: 12px/1 monospace;
+  color: #6c7086;
+  min-width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bs-find-mark {
+  background: #f9e2af;
+  color: #11111b;
+  border-radius: 2px;
+}
+
+.bs-find-mark.bs-find-current {
+  background: #fab387;
+}

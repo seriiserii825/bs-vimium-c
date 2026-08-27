@@ -8,6 +8,8 @@ import "./seoinfo.css";
 import "./seoheadings.css";
 import "./tabswitcher.css";
 import "./timecode.css";
+import "./historysearch.css";
+import "./findinpage.css";
 import { beginHints, typeHint, endHints, unhoverLast, HintSession } from "./hints";
 import { beginTabSwitch, typeTabSwitch, endTabSwitch, TabSwitchSession, beginWindowPick, typeWindowPick, endWindowPick, WindowPickSession } from "./tabswitcher";
 import { showHelp, hideHelp, isHelpVisible } from "./help";
@@ -18,6 +20,8 @@ import { hideImageInfo, isImageInfoVisible } from "./imageinfo";
 import { showSeoInfo, hideSeoInfo, isSeoInfoVisible } from "./seoinfo";
 import { showSeoHeadings, hideSeoHeadings, isSeoHeadingsVisible } from "./seoheadings";
 import { showTimecode, hideTimecode, isTimecodeVisible, saveCurrentTimecode, exportTimecodes, importTimecodes, startTimecodeWatcher } from "./timecode";
+import { showHistorySearch, hideHistorySearch, isHistorySearchVisible, HistoryEntry } from "./historysearch";
+import { showFind, hideFind, isFindVisible } from "./findinpage";
 import { applyBestQuality } from "./videoquality";
 import { showToast } from "./toast";
 import { writeText } from "./clipboard";
@@ -102,6 +106,8 @@ type Action =
   | "videoQuality"
   | "videoFullscreen"
   | "openVideoNewTab"
+  | "showHistory"
+  | "findInPage"
   | "reloadExtension";
 
 function extractPostIdFromBodyClass(): string | null {
@@ -198,6 +204,16 @@ const actions: Record<Action, () => void> = {
   },
   historyBack:    () => { history.back() },
   historyForward: () => { history.forward() },
+  showHistory: () => {
+    chrome.runtime.sendMessage({ type: "searchHistory" }, (res) => {
+      const items: HistoryEntry[] = res?.items ?? [];
+      showHistorySearch(items, (url, newTab) => {
+        if (newTab) chrome.runtime.sendMessage({ type: "navigateTo", url });
+        else window.location.href = url;
+      });
+    });
+  },
+  findInPage: () => { showFind(); },
   scrollToTop: scrollToTop,
   scrollToBottom: scrollToBottom,
   goUpUrl: () => {
@@ -451,6 +467,8 @@ document.addEventListener(
       if (isImageInfoVisible()) { hideImageInfo(); e.preventDefault(); return; }
       if (isSeoInfoVisible()) { hideSeoInfo(); e.preventDefault(); return; }
       if (isSeoHeadingsVisible()) { hideSeoHeadings(); e.preventDefault(); return; }
+      if (isHistorySearchVisible()) { hideHistorySearch(); e.preventDefault(); return; }
+      if (isFindVisible()) { hideFind(); e.preventDefault(); return; }
       if (isPromptVisible()) { hidePrompt(); return; }
       if (isHelpVisible()) { hideHelp(); return; }
       (document.activeElement as HTMLElement)?.blur();
@@ -465,6 +483,8 @@ document.addEventListener(
     if (isTimecodeVisible() && e.key === "q") { hideTimecode(); e.preventDefault(); return; }
 
     if (isHelpVisible()) return;
+    if (isHistorySearchVisible()) return;
+    if (isFindVisible()) return;
 
     if (isEditing()) return;
     if (e.repeat) return; // ignore OS key-repeat, we handle held keys ourselves

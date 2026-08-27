@@ -31,7 +31,7 @@ This is a Manifest V3 Chrome extension with two independent scripts built from `
 - N-char chords: `gg`, `yv`, `ymv`, `oml` (prefix keys are auto-detected at build time)
 - Alt combos: `A-h` prefix notation (e.g. `A-h` = Alt+H)
 
-The `group` column is used by the help popup (`help.ts`) for display grouping. Defined groups: `scroll`, `history`, `click`, `copy`, `svg`, `image`, `url`, `tab`, `seo`, `input`, `zoom`, `timecode`, `video`, `dev`.
+The `group` column is used by the help popup (`help.ts`) for display grouping. Defined groups: `scroll`, `history`, `click`, `copy`, `svg`, `image`, `url`, `tab`, `seo`, `input`, `zoom`, `timecode`, `video`, `find`, `dev`.
 
 Adding a new action requires: a new row in `maps.csv`, a new entry in the `Action` union type in `content.ts`, and a handler in the `actions` record. For background actions, also handle the message type in `background.ts`.
 

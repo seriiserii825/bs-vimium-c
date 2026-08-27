@@ -9,6 +9,16 @@
 chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; currentTabId?: number; targetWindowId?: number; ratio?: number; tabId?: number; quality?: string }, _sender, sendResponse) => {
   const type = msg.type;
 
+  if (type === "searchHistory") {
+    chrome.history.search({ text: "", maxResults: 5000, startTime: 0 }, (results) => {
+      const items = results
+        .sort((a, b) => (b.lastVisitTime ?? 0) - (a.lastVisitTime ?? 0))
+        .map((r) => ({ title: r.title || r.url || "", url: r.url || "" }));
+      sendResponse({ items });
+    });
+    return true;
+  }
+
   if (type === "getTabs") {
     chrome.tabs.query({ currentWindow: true }, (tabs) => {
       const sorted = tabs.filter(t => t.index !== undefined).sort((a, b) => a.index! - b.index!)
