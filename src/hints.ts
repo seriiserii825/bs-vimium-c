@@ -103,6 +103,7 @@ export interface HintSession {
   container: HTMLElement
   collected?: string[]
   collectedEntries?: HintEntry[]
+  count: number
 }
 
 let lastHovered: HTMLElement | null = null
@@ -314,7 +315,7 @@ function getLinksAndButtons(): Clickable[] {
   return result
 }
 
-export function beginHints(mode: HintMode): HintSession | null {
+export function beginHints(mode: HintMode, count = 1): HintSession | null {
   const rawElements: HTMLElement[] | Clickable[] =
     (mode === 'y' || mode === 'ym') ? getCopyable()
     : mode === 'yl' ? Array.from(document.querySelectorAll<HTMLElement>('a[href]')).filter(isVisible)
@@ -354,7 +355,7 @@ export function beginHints(mode: HintMode): HintSession | null {
     return { el, clickTarget, label: labels[i], node }
   })
 
-  return { mode, entries, typed: '', container }
+  return { mode, entries, typed: '', container, count: Math.max(1, count) }
 }
 
 export function typeHint(session: HintSession, key: string): 'continue' | 'done' | 'cancel' {
@@ -465,7 +466,7 @@ export function typeHint(session: HintSession, key: string): 'continue' | 'done'
       for (const entry of session.entries) entry.node.classList.remove('dim')
       return 'continue'
     }
-    activate(match, session.mode)
+    activate(match, session.mode, session.count)
     return 'done'
   }
 
@@ -519,8 +520,13 @@ async function copyImageToClipboard(imgEl: HTMLImageElement): Promise<void> {
   }
 }
 
-function activate(entry: HintEntry, mode: HintMode): void {
-  if (mode === 'ctc') {
+function activate(entry: HintEntry, mode: HintMode, count = 1): void {
+  if (mode === 'f') {
+    const clickEl = entry.clickTarget ?? entry.el
+    clickEl.focus()
+    for (let i = 0; i < count; i++) clickEl.click()
+    if (count > 1) showToast(`Clicked ${count}×`)
+  } else if (mode === 'ctc') {
     const text = getColumnText(entry.el as HTMLTableCellElement)
     writeText(text)
     showToast(`Copied ${text.split('\n').length} cells`)

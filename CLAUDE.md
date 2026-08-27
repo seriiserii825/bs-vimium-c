@@ -14,7 +14,7 @@ bun run lint:fix     # eslint with auto-fix
 
 No tests exist in this project.
 
-**Do not run `bun run build` automatically.** After making changes, tell the user to run `bun run build` themselves, then reload the extension manually in `chrome://extensions`.
+**Always run `bun run build` at the end of a coding task** (see the `build` skill in `.claude/skills/build/`). After it passes, remind the user to reload the extension manually in `chrome://extensions`.
 
 To load the extension in Chrome: open `chrome://extensions`, enable Developer mode, click "Load unpacked", and select the `dist/` folder.
 

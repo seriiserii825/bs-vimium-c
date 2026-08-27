@@ -140,7 +140,7 @@ function extractWpPostId(): string | null {
 
 const actions: Record<Action, () => void> = {
   followLink: () => {
-    session = beginHints("f");
+    session = beginHints("f", currentCount);
   },
   followFormControl: () => {
     session = beginHints("c");
@@ -348,6 +348,10 @@ for (const hotkey of keyMap.keys()) {
 let pendingPrefix = "";
 let prefixTimeout: ReturnType<typeof setTimeout> | null = null;
 
+let countPrefix = "";
+let countTimeout: ReturnType<typeof setTimeout> | null = null;
+let currentCount = 1;
+
 function clearPending(): void {
   pendingPrefix = "";
   hideWhichKey();
@@ -355,6 +359,20 @@ function clearPending(): void {
     clearTimeout(prefixTimeout);
     prefixTimeout = null;
   }
+}
+
+function clearCount(): void {
+  countPrefix = "";
+  if (countTimeout !== null) {
+    clearTimeout(countTimeout);
+    countTimeout = null;
+  }
+}
+
+function dispatchAction(action: Action): void {
+  currentCount = countPrefix ? Math.max(1, parseInt(countPrefix, 10)) : 1;
+  clearCount();
+  actions[action]();
 }
 
 function isEditing(): boolean {
@@ -461,6 +479,7 @@ document.addEventListener(
     }
 
     if (e.key === "Escape") {
+      clearCount();
       if (isTimecodeVisible()) { e.preventDefault(); return; }
       if (isWhichKeyVisible()) { clearPending(); e.preventDefault(); return; }
       if (isCookieConfirmVisible()) { hideCookieConfirm(); e.preventDefault(); return; }
@@ -489,12 +508,27 @@ document.addEventListener(
     if (isEditing()) return;
     if (e.repeat) return; // ignore OS key-repeat, we handle held keys ourselves
 
+    if (!pendingPrefix && countPrefix === "" && /^[1-9]$/.test(e.key)) {
+      e.preventDefault();
+      countPrefix = e.key;
+      if (countTimeout !== null) clearTimeout(countTimeout);
+      countTimeout = setTimeout(clearCount, 5000);
+      return;
+    }
+    if (!pendingPrefix && countPrefix !== "" && /^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+      countPrefix += e.key;
+      if (countTimeout !== null) clearTimeout(countTimeout);
+      countTimeout = setTimeout(clearCount, 5000);
+      return;
+    }
+
     if (pendingPrefix) {
       const combo = pendingPrefix + e.key;
       if (keyMap.has(combo)) {
         clearPending();
         e.preventDefault();
-        actions[keyMap.get(combo)!]();
+        dispatchAction(keyMap.get(combo)!);
       } else if (prefixStrings.has(combo)) {
         e.preventDefault();
         pendingPrefix = combo;
@@ -503,6 +537,7 @@ document.addEventListener(
         showWhichKey(pendingPrefix, mappings);
       } else {
         clearPending();
+        clearCount();
       }
       return;
     }
@@ -518,7 +553,9 @@ document.addEventListener(
     const action = keyMap.get(e.key);
     if (action) {
       e.preventDefault();
-      actions[action]();
+      dispatchAction(action);
+    } else {
+      clearCount();
     }
   },
   true,
