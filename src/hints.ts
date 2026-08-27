@@ -343,14 +343,46 @@ export function beginHints(mode: HintMode, count = 1): HintSession | null {
   container.id = 'bs-vimium-hints'
   document.documentElement.appendChild(container)
 
+  // Nested elements (e.g. <strong> as the first child of <p>) can share the exact
+  // same top-left point, so their hints would paint on top of each other and only the
+  // topmost (last-appended) one would ever be clickable. Detect real ancestor/descendant
+  // pairs whose rects nearly coincide (exact rounded-pixel matching is too fragile — sub-pixel
+  // layout differences make ancestor and descendant round to different integers) and push the
+  // nested (descendant) element's hint diagonally out of the way, once per matching ancestor.
+  // The outermost element (e.g. the <p>) keeps its natural position at the visible text start,
+  // since that's the one users expect to find there — it also copies the full text including
+  // nested children via innerText.
+  const EPS = 3
+  const rects = clickables.map(({ el }) => el.getBoundingClientRect())
+  const offsetLevels = clickables.map(({ el }, i) => {
+    let level = 0
+    for (let j = 0; j < clickables.length; j++) {
+      if (i === j) continue
+      const otherEl = clickables[j].el
+      if (!otherEl.contains(el)) continue // otherEl is an ancestor of el
+      const a = rects[i], b = rects[j]
+      if (Math.abs(a.left - b.left) <= EPS && Math.abs(a.top - b.top) <= EPS) level++
+    }
+    return level
+  })
+
   const entries: HintEntry[] = clickables.map(({ el, clickTarget }, i) => {
-    const r = el.getBoundingClientRect()
+    const r = rects[i]
+    const level = offsetLevels[i]
+    // A colliding nested element starts at the exact same point as its ancestor, so there's
+    // no usable spot "at its start" that isn't already taken — and its right edge sits right
+    // where the NEXT sibling's text begins, which visually reads as belonging to that sibling
+    // instead. Move it straight up, clear of the line's own text entirely, so it can't be
+    // mistaken for any of the surrounding content.
+    const left = Math.round(r.left) + (level > 0 ? (level - 1) * 14 : 0)
+    const top = Math.round(r.top) - level * 16
+
     const node = document.createElement('div')
     node.className = 'bs-vimium-hint'
     node.textContent = labels[i]
     // Container is position:fixed at (0,0), so these are viewport coords
-    node.style.left = `${Math.round(r.left)}px`
-    node.style.top = `${Math.round(r.top)}px`
+    node.style.left = `${left}px`
+    node.style.top = `${top}px`
     container.appendChild(node)
     return { el, clickTarget, label: labels[i], node }
   })
