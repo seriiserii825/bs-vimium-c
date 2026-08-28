@@ -187,7 +187,26 @@ chrome.runtime.onMessage.addListener((msg: { type: string; url?: string; current
   }
 
   if (type === "reloadExtension") {
-    chrome.storage.local.set({ reloadedToast: true }, () => chrome.runtime.reload());
+    const QUICK_TABS_NAME = "Quick Tabs Project";
+
+    const selfReload = () => {
+      chrome.storage.local.set({ reloadedToast: true }, () => chrome.runtime.reload());
+    };
+
+    chrome.management.getAll((extensions) => {
+      const target = extensions.find((e) => e.name === QUICK_TABS_NAME && e.id !== chrome.runtime.id);
+
+      if (!target) {
+        selfReload();
+        return;
+      }
+
+      chrome.management.setEnabled(target.id, false, () => {
+        chrome.management.setEnabled(target.id, true, () => {
+          selfReload();
+        });
+      });
+    });
     return;
   }
 
