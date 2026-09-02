@@ -500,6 +500,11 @@ document.addEventListener(
     }
 
     if (isTimecodeVisible() && e.key === "q") { hideTimecode(); e.preventDefault(); return; }
+    if (isCookieConfirmVisible() && e.key === "q") { hideCookieConfirm(); e.preventDefault(); return; }
+    if (isImageInfoVisible() && e.key === "q") { hideImageInfo(); e.preventDefault(); return; }
+    if (isSeoInfoVisible() && e.key === "q") { hideSeoInfo(); e.preventDefault(); return; }
+    if (isSeoHeadingsVisible() && e.key === "q") { hideSeoHeadings(); e.preventDefault(); return; }
+    if (isHelpVisible() && e.key === "q") { hideHelp(); e.preventDefault(); return; }
 
     if (isHelpVisible()) return;
     if (isHistorySearchVisible()) return;
