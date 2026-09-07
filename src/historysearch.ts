@@ -58,7 +58,9 @@ function filterEntries(query: string): HistoryEntry[] {
   }
 
   const scored: { entry: HistoryEntry; score: number }[] = []
-  const matchedOrigins = new Set<string>()
+  // Best score seen for each origin, so a domain's overall relevance is judged by
+  // its strongest-matching page, not diluted or overridden by shorter paths.
+  const bestScoreByOrigin = new Map<string, number>()
   const originsWithRoot = new Set<string>()
   for (const entry of allEntries) {
     const haystack = `${entry.title} ${entry.url}`.toLowerCase()
@@ -67,21 +69,26 @@ function filterEntries(query: string): HistoryEntry[] {
     scored.push({ entry, score })
     const origin = getOrigin(entry.url)
     if (!origin) continue
-    matchedOrigins.add(origin)
+    bestScoreByOrigin.set(origin, Math.max(bestScoreByOrigin.get(origin) ?? -Infinity, score))
     if (pathSegmentCount(entry.url) === 0) originsWithRoot.add(origin)
   }
 
   // No visit to the bare domain itself exists among the matches — synthesize one
-  // so the shortest URL for a matched domain always surfaces first.
-  for (const origin of matchedOrigins) {
+  // so the shortest URL for a matched domain always surfaces first within it.
+  for (const [origin, bestScore] of bestScoreByOrigin) {
     if (originsWithRoot.has(origin)) continue
     scored.push({
       entry: { title: origin.replace(/^https?:\/\//, ''), url: `${origin}/` },
-      score: Infinity,
+      score: bestScore,
     })
   }
 
   scored.sort((a, b) => {
+    const originA = getOrigin(a.entry.url)
+    const originB = getOrigin(b.entry.url)
+    const bestA = originA ? bestScoreByOrigin.get(originA)! : a.score
+    const bestB = originB ? bestScoreByOrigin.get(originB)! : b.score
+    if (bestA !== bestB) return bestB - bestA
     const segDiff = pathSegmentCount(a.entry.url) - pathSegmentCount(b.entry.url)
     return segDiff !== 0 ? segDiff : b.score - a.score
   })
