@@ -31,17 +31,60 @@ function fuzzyScore(query: string, target: string): number | null {
   return qi === query.length ? score : null
 }
 
+// Fewer path segments = more general URL (e.g. bare domain before domain/wp-admin
+// before domain/wp-admin/admin.php), so it's used as the primary sort key.
+function pathSegmentCount(urlStr: string): number {
+  try {
+    return new URL(urlStr).pathname.split('/').filter(Boolean).length
+  } catch {
+    return 0
+  }
+}
+
+function getOrigin(urlStr: string): string | null {
+  try {
+    return new URL(urlStr).origin
+  } catch {
+    return null
+  }
+}
+
 function filterEntries(query: string): HistoryEntry[] {
   const q = query.toLowerCase().trim()
-  if (!q) return allEntries.slice(0, 30)
+  if (!q) {
+    return [...allEntries]
+      .sort((a, b) => pathSegmentCount(a.url) - pathSegmentCount(b.url))
+      .slice(0, 30)
+  }
 
   const scored: { entry: HistoryEntry; score: number }[] = []
+  const matchedOrigins = new Set<string>()
+  const originsWithRoot = new Set<string>()
   for (const entry of allEntries) {
     const haystack = `${entry.title} ${entry.url}`.toLowerCase()
     const score = fuzzyScore(q, haystack)
-    if (score !== null) scored.push({ entry, score })
+    if (score === null) continue
+    scored.push({ entry, score })
+    const origin = getOrigin(entry.url)
+    if (!origin) continue
+    matchedOrigins.add(origin)
+    if (pathSegmentCount(entry.url) === 0) originsWithRoot.add(origin)
   }
-  scored.sort((a, b) => b.score - a.score)
+
+  // No visit to the bare domain itself exists among the matches — synthesize one
+  // so the shortest URL for a matched domain always surfaces first.
+  for (const origin of matchedOrigins) {
+    if (originsWithRoot.has(origin)) continue
+    scored.push({
+      entry: { title: origin.replace(/^https?:\/\//, ''), url: `${origin}/` },
+      score: Infinity,
+    })
+  }
+
+  scored.sort((a, b) => {
+    const segDiff = pathSegmentCount(a.entry.url) - pathSegmentCount(b.entry.url)
+    return segDiff !== 0 ? segDiff : b.score - a.score
+  })
   return scored.slice(0, 30).map((s) => s.entry)
 }
 
